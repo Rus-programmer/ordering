@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	log.Println("Branch restriction check")
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Error loading config", err)
