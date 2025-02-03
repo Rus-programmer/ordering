@@ -18,4 +18,16 @@ dropdb:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-.PHONY: postgres createdb dropdb new_migration
+migrateup:
+	migrate -path db/migration -database "$(DB_SOURCE)" -verbose up
+
+migrateup1:
+	migrate -path db/migration -database "$(DB_SOURCE)" -verbose up 1
+
+migratedown:
+	migrate -path db/migration -database "$(DB_SOURCE)" -verbose down
+
+migratedown1:
+	migrate -path db/migration -database "$(DB_SOURCE)" -verbose down 1
+
+.PHONY: postgres createdb dropdb new_migration migrateup migratedown migrateup1 migratedown1
