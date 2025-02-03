@@ -15,4 +15,7 @@ createdb:
 dropdb:
 	docker exec -it postgres17 dropdb --username=${DB_USER} ${DB_NAME}
 
-.PHONY: postgres createdb dropdb
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
+.PHONY: postgres createdb dropdb new_migration
