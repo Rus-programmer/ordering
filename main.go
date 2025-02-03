@@ -1,23 +1,32 @@
 package main
 
 import (
+	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"ordering/api"
+	db "ordering/db/sqlc"
 	util "ordering/utils"
 )
 
 func main() {
-	log.Println("Branch restriction check")
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Error loading config", err)
 	}
 
-	server, err := api.NewServer(config)
+	pool, err := pgxpool.New(context.Background(), config.DBSource)
+	if err != nil {
+		log.Fatal("Can't connect to database", err)
+	}
+
+	store := db.NewStore(pool)
+
+	server, err := api.NewServer(config, store)
 	if err != nil {
 		log.Fatal("Can't create server", err)
 	}
-	log.Println("config.HTTPServerAddress", config.HTTPServerAddress)
+
 	err = server.Start(config.HTTPServerAddress)
 	if err != nil {
 		log.Fatal("Can't start server", err)
