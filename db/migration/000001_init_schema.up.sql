@@ -24,18 +24,18 @@ CREATE TABLE orders
 CREATE TABLE products
 (
     id         BIGSERIAL PRIMARY KEY,
-    name       VARCHAR(250)   NOT NULL,
-    price      NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
-    quantity   int            NOT NULL CHECK (quantity >= 0),
-    created_at TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ    NOT NULL DEFAULT NOW()
+    name       VARCHAR(250) NOT NULL,
+    price      BIGINT       NOT NULL CHECK (price >= 0),
+    quantity   BIGINT       NOT NULL CHECK (quantity >= 0),
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE order_products
 (
-    order_id   BIGINT NOT NULL REFERENCES orders (id),
+    order_id   BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    quantity   INT    NOT NULL CHECK (quantity > 0),
+    quantity   BIGINT NOT NULL CHECK (quantity > 0),
     PRIMARY KEY (order_id, product_id)
 );
 
@@ -66,20 +66,6 @@ CREATE TRIGGER update_orders_updated_at
     ON orders
     FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
-
-CREATE OR REPLACE FUNCTION prevent_order_deletion()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    RAISE EXCEPTION 'Direct deletion of orders is prohibited. Use soft delete (UPDATE).';
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER prevent_order_deletion_trigger
-    BEFORE DELETE
-    ON orders
-    FOR EACH ROW
-EXECUTE FUNCTION prevent_order_deletion();
 
 CREATE INDEX idx_products_name ON products (name);
 CREATE INDEX idx_orders_status ON orders (status);
