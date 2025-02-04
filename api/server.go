@@ -1,6 +1,7 @@
 package api
 
 import (
+	db "ordering/db/sqlc"
 	util "ordering/utils"
 
 	"github.com/gin-gonic/gin"
@@ -10,14 +11,16 @@ import (
 type Server struct {
 	config util.Config
 	router *gin.Engine
+	store  db.Store
 }
 
 // NewServer creates a new HTTP server and set up routing.
-func NewServer(config util.Config) (*Server, error) {
+func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router := gin.Default()
 	server := &Server{
 		config: config,
 		router: router,
+		store:  store,
 	}
 
 	router.GET("/ping", func(c *gin.Context) {
