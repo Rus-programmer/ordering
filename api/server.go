@@ -2,6 +2,7 @@ package api
 
 import (
 	db "ordering/db/sqlc"
+	"ordering/logging"
 	util "ordering/utils"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +18,8 @@ type Server struct {
 // NewServer creates a new HTTP server and set up routing.
 func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router := gin.New()
-	router.Use(util.GinLogger())
+	router.Use(logging.GinLogger())
+	router.Use(logging.LogToDB(store))
 
 	server := &Server{
 		config: config,

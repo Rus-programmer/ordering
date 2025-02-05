@@ -1,11 +1,10 @@
-package util
+package logging
 
 import (
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"io"
 	"time"
 )
 
@@ -30,39 +29,17 @@ func GinLogger() gin.HandlerFunc {
 			return
 		}
 
-		// before executing the next handlers
-		begin := time.Now()
-		path := ctx.Request.URL.Path
-		raw := ctx.Request.URL.RawQuery
-		if raw != "" {
-			path = path + "?" + raw
-		}
+		ginInfo := extractInfoFromGinContext(ctx)
 
-		// Get payload from request
-		payload, _ := io.ReadAll(ctx.Request.Body)
-		ctx.Request.Body = io.NopCloser(bytes.NewReader(payload))
-
-		// Get a copy of the body
-		w := &responseBodyWriter{body: &bytes.Buffer{}, ResponseWriter: ctx.Writer}
-		ctx.Writer = w
-
-		// executes the pending handlers
-		ctx.Next()
-
-		// after executing the handlers
-		duration := time.Since(begin)
-		statusCode := ctx.Writer.Status()
-
-		//
 		var event *zerolog.Event
 		var eventError bool
 		var eventWarn bool
 
 		// set message level
-		if statusCode >= 400 && statusCode < 500 {
+		if ginInfo.StatusCode >= 400 && ginInfo.StatusCode < 500 {
 			eventWarn = true
 			event = z.Warn()
-		} else if statusCode >= 500 {
+		} else if ginInfo.StatusCode >= 500 {
 			eventError = true
 			event = z.Error()
 		} else {
@@ -70,19 +47,19 @@ func GinLogger() gin.HandlerFunc {
 		}
 
 		// Path field
-		if len(path) > 0 {
-			event.Str(PathFieldName, path)
+		if len(ginInfo.Path) > 0 {
+			event.Str(PathFieldName, ginInfo.Path)
 		}
 
 		// Method field
 		event.Str(MethodFieldName, ctx.Request.Method)
 
 		// statusCode field
-		event.Int(statusCodeFieldName, statusCode)
+		event.Int(statusCodeFieldName, ginInfo.StatusCode)
 
 		// Payload field
-		if len(payload) > 0 {
-			event.Str(PayloadFieldName, string(payload))
+		if len(ginInfo.Payload) > 0 {
+			event.Str(PayloadFieldName, string(ginInfo.Payload))
 		}
 
 		// Duration field
@@ -104,11 +81,11 @@ func GinLogger() gin.HandlerFunc {
 			z.Error().Interface("zerolog.DurationFieldUnit", zerolog.DurationFieldUnit).Msg("unknown value for DurationFieldUnit")
 			durationFieldName = DurationFieldName
 		}
-		event.Dur(durationFieldName, duration)
+		event.Dur(durationFieldName, ginInfo.Duration)
 
 		// Body field
-		if len(w.body.String()) > 0 {
-			event.Str(BodyFieldName, w.body.String())
+		if len(ginInfo.Body) > 0 {
+			event.Str(BodyFieldName, ginInfo.Body)
 		}
 
 		// Message
