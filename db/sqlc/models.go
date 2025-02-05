@@ -104,6 +104,15 @@ type Customer struct {
 	UpdatedAt      time.Time `json:"updated_at"`
 }
 
+type Log struct {
+	ID          int64     `json:"id"`
+	Method      string    `json:"method"`
+	Path        string    `json:"path"`
+	StatusCode  int32     `json:"status_code"`
+	ElapsedTime string    `json:"elapsed_time"`
+	Time        time.Time `json:"time"`
+}
+
 type Order struct {
 	ID         int64       `json:"id"`
 	CustomerID int64       `json:"customer_id"`
