@@ -1,15 +1,16 @@
-package logging
+package api
 
 import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	db "ordering/db/sqlc"
+	"ordering/logging"
 )
 
-func LogToDB(store db.Store) gin.HandlerFunc {
+func LogDB(store db.Store) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ginInfo := extractInfoFromGinContext(ctx)
+		ginInfo := logging.ExtractInfoFromGinContext(ctx)
 
 		arg := db.CreateLogParams{
 			Method:      ginInfo.Method,
