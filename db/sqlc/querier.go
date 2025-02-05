@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error)
+	CreateLog(ctx context.Context, arg CreateLogParams) error
 	CreateOrder(ctx context.Context, customerID int64) (Order, error)
 	CreateOrderProducts(ctx context.Context, arg []CreateOrderProductsParams) (int64, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
