@@ -17,7 +17,7 @@ type LogInfo struct {
 	BeginTime  time.Time
 }
 
-func extractInfoFromGinContext(ctx *gin.Context) *LogInfo {
+func ExtractInfoFromGinContext(ctx *gin.Context) *LogInfo {
 	// before executing the next handlers
 	begin := time.Now()
 	path := ctx.Request.URL.Path
@@ -46,4 +46,19 @@ func extractInfoFromGinContext(ctx *gin.Context) *LogInfo {
 		Body:       w.body.String(),
 		BeginTime:  begin,
 	}
+}
+
+type responseBodyWriter struct {
+	gin.ResponseWriter
+	body *bytes.Buffer
+}
+
+func (r responseBodyWriter) Write(b []byte) (int, error) {
+	r.body.Write(b)
+	return r.ResponseWriter.Write(b)
+}
+
+func (r responseBodyWriter) WriteString(s string) (n int, err error) {
+	r.body.WriteString(s)
+	return r.ResponseWriter.WriteString(s)
 }

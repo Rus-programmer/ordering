@@ -33,7 +33,10 @@ migratedown1:
 sqlc:
 	sqlc generate
 
+mock:
+	mockgen -package mockdb -destination db/mock/store.go ordering/db/sqlc Store
+
 test:
 	go test -v -cover -short ./...
 
-.PHONY: postgres createdb dropdb new_migration migrateup migratedown migrateup1 migratedown1 sqlc test
+.PHONY: postgres createdb dropdb new_migration migrateup migratedown migrateup1 migratedown1 sqlc mock test

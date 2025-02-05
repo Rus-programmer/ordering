@@ -19,7 +19,7 @@ type Server struct {
 func NewServer(config util.Config, store db.Store) (*Server, error) {
 	router := gin.New()
 	router.Use(logging.GinLogger())
-	router.Use(logging.LogToDB(store))
+	router.Use(LogDB(store))
 
 	server := &Server{
 		config: config,

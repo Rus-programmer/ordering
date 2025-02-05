@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -29,7 +28,7 @@ func GinLogger() gin.HandlerFunc {
 			return
 		}
 
-		ginInfo := extractInfoFromGinContext(ctx)
+		ginInfo := ExtractInfoFromGinContext(ctx)
 
 		var event *zerolog.Event
 		var eventError bool
@@ -103,19 +102,4 @@ func GinLogger() gin.HandlerFunc {
 			event.Msg(message)
 		}
 	}
-}
-
-type responseBodyWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
-
-func (r responseBodyWriter) Write(b []byte) (int, error) {
-	r.body.Write(b)
-	return r.ResponseWriter.Write(b)
-}
-
-func (r responseBodyWriter) WriteString(s string) (n int, err error) {
-	r.body.WriteString(s)
-	return r.ResponseWriter.WriteString(s)
 }
