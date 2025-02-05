@@ -16,7 +16,9 @@ type Server struct {
 
 // NewServer creates a new HTTP server and set up routing.
 func NewServer(config util.Config, store db.Store) (*Server, error) {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(util.GinLogger())
+
 	server := &Server{
 		config: config,
 		router: router,
