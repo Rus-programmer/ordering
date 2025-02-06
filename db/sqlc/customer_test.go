@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	util "ordering/utils"
+	util "ordering/util"
 	"testing"
 	"time"
 )

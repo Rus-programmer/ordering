@@ -6,8 +6,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	db "ordering/db/sqlc"
 	"ordering/logging"
+	"ordering/middleware"
 	"ordering/token"
-	util "ordering/utils"
+	util "ordering/util"
+	"ordering/validators"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +32,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 	if config.Environment != "test" {
 		router.Use(logging.GinLogger())
-		router.Use(LogDB(store))
+		router.Use(middleware.LogDB(store))
 	}
 
 	server := &Server{
@@ -41,7 +43,10 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("role", validRole)
+		err := v.RegisterValidation("role", validators.ValidRole)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	server.setupRouter()
@@ -53,16 +58,12 @@ func (server *Server) Start(address string) error {
 	return server.router.Run(address)
 }
 
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
-}
-
 func (server *Server) setupRouter() {
 	server.router.POST("/users", server.createCustomer)
 	server.router.POST("/login", server.login)
 	server.router.POST("/tokens/renew_access", server.renewAccessToken)
 
-	authRoutes := server.router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes := server.router.Group("/").Use(middleware.Auth(server.tokenMaker))
 	authRoutes.GET("/products/:id", server.getProduct)
 	authRoutes.GET("/products", server.listProducts)
 }

@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"log"
-	util "ordering/utils"
+	util "ordering/util"
 	"os"
 	"testing"
 

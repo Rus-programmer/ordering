@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "ordering/db/sqlc"
-	"ordering/utils"
+	"ordering/util"
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {

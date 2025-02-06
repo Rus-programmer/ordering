@@ -1,4 +1,4 @@
-package api
+package middleware
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"ordering/logging"
 )
 
+// LogDB creates a gin middleware for inserting logs to db
 func LogDB(store db.Store) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ginInfo := logging.ExtractInfoFromGinContext(ctx)

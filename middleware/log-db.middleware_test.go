@@ -1,4 +1,4 @@
-package api
+package middleware
 
 import (
 	"bytes"
@@ -11,7 +11,6 @@ import (
 	mockdb "ordering/db/mock"
 	db "ordering/db/sqlc"
 	"ordering/logging"
-	util "ordering/utils"
 	"testing"
 	"time"
 )
@@ -22,14 +21,11 @@ func TestLogDB(t *testing.T) {
 
 	mockStore := mockdb.NewMockStore(ctrl)
 
-	config := util.Config{
-		TokenSymmetricKey:   util.RandomString(32),
-		AccessTokenDuration: time.Minute,
-	}
-	server, err := NewServer(config, mockStore)
-	require.NoError(t, err)
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	r.Use(LogDB(mockStore))
 
-	server.router.GET("/test", func(c *gin.Context) {
+	r.GET("/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
 	})
 
@@ -58,7 +54,7 @@ func TestLogDB(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/test", bytes.NewBuffer([]byte{}))
 	w := httptest.NewRecorder()
-	server.router.ServeHTTP(w, req)
+	r.ServeHTTP(w, req)
 
 	select {
 	case <-done:

@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	mockdb "ordering/db/mock"
 	db "ordering/db/sqlc"
-	"ordering/utils"
+	"ordering/util"
 )
 
 type eqCreateCustomerParamsMatcher struct {

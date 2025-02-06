@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"ordering/api"
 	db "ordering/db/sqlc"
-	util "ordering/utils"
+	util "ordering/util"
 	"os"
 )
 

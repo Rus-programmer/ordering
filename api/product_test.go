@@ -10,10 +10,12 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"ordering/common"
 	mockdb "ordering/db/mock"
 	db "ordering/db/sqlc"
+	test_utils "ordering/test-utils"
 	"ordering/token"
-	util "ordering/utils"
+	util "ordering/util"
 	"testing"
 	"time"
 )
@@ -46,7 +48,7 @@ func TestListProductsAPI(t *testing.T) {
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.ListProductsParams{
@@ -88,7 +90,7 @@ func TestListProductsAPI(t *testing.T) {
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -107,7 +109,7 @@ func TestListProductsAPI(t *testing.T) {
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -125,7 +127,7 @@ func TestListProductsAPI(t *testing.T) {
 				pageSize: 100000,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -202,7 +204,7 @@ func TestGetProductAPI(t *testing.T) {
 			name:      "OK",
 			productID: product.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -233,7 +235,7 @@ func TestGetProductAPI(t *testing.T) {
 			name:      "NotFound",
 			productID: product.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 
 			buildStubs: func(store *mockdb.MockStore) {
@@ -250,7 +252,7 @@ func TestGetProductAPI(t *testing.T) {
 			name:      "InternalError",
 			productID: product.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -266,7 +268,7 @@ func TestGetProductAPI(t *testing.T) {
 			name:      "InvalidID",
 			productID: 0,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, user.ID, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().

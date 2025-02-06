@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"github.com/stretchr/testify/require"
-	util "ordering/utils"
+	util "ordering/util"
 	"testing"
 )
 
