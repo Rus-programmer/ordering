@@ -11,6 +11,7 @@ import (
 	mockdb "ordering/db/mock"
 	db "ordering/db/sqlc"
 	"ordering/logging"
+	util "ordering/utils"
 	"testing"
 	"time"
 )
@@ -21,7 +22,12 @@ func TestLogDB(t *testing.T) {
 
 	mockStore := mockdb.NewMockStore(ctrl)
 
-	server := newTestServer(t, mockStore)
+	config := util.Config{
+		TokenSymmetricKey:   util.RandomString(32),
+		AccessTokenDuration: time.Minute,
+	}
+	server, err := NewServer(config, mockStore)
+	require.NoError(t, err)
 
 	server.router.GET("/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
@@ -50,7 +56,7 @@ func TestLogDB(t *testing.T) {
 			return nil
 		}).Times(1)
 
-	req, _ := http.NewRequest("GET", "/test", bytes.NewBuffer([]byte{}))
+	req, _ := http.NewRequest(http.MethodGet, "/test", bytes.NewBuffer([]byte{}))
 	w := httptest.NewRecorder()
 	server.router.ServeHTTP(w, req)
 

@@ -11,9 +11,10 @@ package mockdb
 
 import (
 	context "context"
-	sqlc "ordering/db/sqlc"
+	db "ordering/db/sqlc"
 	reflect "reflect"
 
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,10 +43,10 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // CreateCustomer mocks base method.
-func (m *MockStore) CreateCustomer(ctx context.Context, arg sqlc.CreateCustomerParams) (sqlc.Customer, error) {
+func (m *MockStore) CreateCustomer(ctx context.Context, arg db.CreateCustomerParams) (db.Customer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCustomer", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Customer)
+	ret0, _ := ret[0].(db.Customer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -57,7 +58,7 @@ func (mr *MockStoreMockRecorder) CreateCustomer(ctx, arg any) *gomock.Call {
 }
 
 // CreateLog mocks base method.
-func (m *MockStore) CreateLog(ctx context.Context, arg sqlc.CreateLogParams) error {
+func (m *MockStore) CreateLog(ctx context.Context, arg db.CreateLogParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateLog", ctx, arg)
 	ret0, _ := ret[0].(error)
@@ -71,10 +72,10 @@ func (mr *MockStoreMockRecorder) CreateLog(ctx, arg any) *gomock.Call {
 }
 
 // CreateOrder mocks base method.
-func (m *MockStore) CreateOrder(ctx context.Context, customerID int64) (sqlc.Order, error) {
+func (m *MockStore) CreateOrder(ctx context.Context, customerID int64) (db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrder", ctx, customerID)
-	ret0, _ := ret[0].(sqlc.Order)
+	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -86,7 +87,7 @@ func (mr *MockStoreMockRecorder) CreateOrder(ctx, customerID any) *gomock.Call {
 }
 
 // CreateOrderProducts mocks base method.
-func (m *MockStore) CreateOrderProducts(ctx context.Context, arg []sqlc.CreateOrderProductsParams) (int64, error) {
+func (m *MockStore) CreateOrderProducts(ctx context.Context, arg []db.CreateOrderProductsParams) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrderProducts", ctx, arg)
 	ret0, _ := ret[0].(int64)
@@ -101,10 +102,10 @@ func (mr *MockStoreMockRecorder) CreateOrderProducts(ctx, arg any) *gomock.Call 
 }
 
 // CreateProduct mocks base method.
-func (m *MockStore) CreateProduct(ctx context.Context, arg sqlc.CreateProductParams) (sqlc.Product, error) {
+func (m *MockStore) CreateProduct(ctx context.Context, arg db.CreateProductParams) (db.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProduct", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Product)
+	ret0, _ := ret[0].(db.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -113,6 +114,21 @@ func (m *MockStore) CreateProduct(ctx context.Context, arg sqlc.CreateProductPar
 func (mr *MockStoreMockRecorder) CreateProduct(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProduct", reflect.TypeOf((*MockStore)(nil).CreateProduct), ctx, arg)
+}
+
+// CreateSession mocks base method.
+func (m *MockStore) CreateSession(ctx context.Context, arg db.CreateSessionParams) (db.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSession", ctx, arg)
+	ret0, _ := ret[0].(db.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateSession indicates an expected call of CreateSession.
+func (mr *MockStoreMockRecorder) CreateSession(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockStore)(nil).CreateSession), ctx, arg)
 }
 
 // DeleteCustomer mocks base method.
@@ -158,10 +174,10 @@ func (mr *MockStoreMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
 }
 
 // GetCustomerByUsername mocks base method.
-func (m *MockStore) GetCustomerByUsername(ctx context.Context, username string) (sqlc.Customer, error) {
+func (m *MockStore) GetCustomerByUsername(ctx context.Context, username string) (db.Customer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCustomerByUsername", ctx, username)
-	ret0, _ := ret[0].(sqlc.Customer)
+	ret0, _ := ret[0].(db.Customer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -173,10 +189,10 @@ func (mr *MockStoreMockRecorder) GetCustomerByUsername(ctx, username any) *gomoc
 }
 
 // GetOrder mocks base method.
-func (m *MockStore) GetOrder(ctx context.Context, arg sqlc.GetOrderParams) (sqlc.Order, error) {
+func (m *MockStore) GetOrder(ctx context.Context, arg db.GetOrderParams) (db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrder", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Order)
+	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -188,10 +204,10 @@ func (mr *MockStoreMockRecorder) GetOrder(ctx, arg any) *gomock.Call {
 }
 
 // GetProduct mocks base method.
-func (m *MockStore) GetProduct(ctx context.Context, id int64) (sqlc.Product, error) {
+func (m *MockStore) GetProduct(ctx context.Context, id int64) (db.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProduct", ctx, id)
-	ret0, _ := ret[0].(sqlc.Product)
+	ret0, _ := ret[0].(db.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -200,6 +216,21 @@ func (m *MockStore) GetProduct(ctx context.Context, id int64) (sqlc.Product, err
 func (mr *MockStoreMockRecorder) GetProduct(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProduct", reflect.TypeOf((*MockStore)(nil).GetProduct), ctx, id)
+}
+
+// GetSession mocks base method.
+func (m *MockStore) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSession", ctx, id)
+	ret0, _ := ret[0].(db.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSession indicates an expected call of GetSession.
+func (mr *MockStoreMockRecorder) GetSession(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStore)(nil).GetSession), ctx, id)
 }
 
 // GetTotalPrice mocks base method.
@@ -218,10 +249,10 @@ func (mr *MockStoreMockRecorder) GetTotalPrice(ctx, orderID any) *gomock.Call {
 }
 
 // ListCustomers mocks base method.
-func (m *MockStore) ListCustomers(ctx context.Context, arg sqlc.ListCustomersParams) ([]sqlc.Customer, error) {
+func (m *MockStore) ListCustomers(ctx context.Context, arg db.ListCustomersParams) ([]db.Customer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListCustomers", ctx, arg)
-	ret0, _ := ret[0].([]sqlc.Customer)
+	ret0, _ := ret[0].([]db.Customer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -233,10 +264,10 @@ func (mr *MockStoreMockRecorder) ListCustomers(ctx, arg any) *gomock.Call {
 }
 
 // ListOrders mocks base method.
-func (m *MockStore) ListOrders(ctx context.Context, customerID int64) ([]sqlc.Order, error) {
+func (m *MockStore) ListOrders(ctx context.Context, customerID int64) ([]db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListOrders", ctx, customerID)
-	ret0, _ := ret[0].([]sqlc.Order)
+	ret0, _ := ret[0].([]db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -248,10 +279,10 @@ func (mr *MockStoreMockRecorder) ListOrders(ctx, customerID any) *gomock.Call {
 }
 
 // ListProducts mocks base method.
-func (m *MockStore) ListProducts(ctx context.Context, arg sqlc.ListProductsParams) ([]sqlc.Product, error) {
+func (m *MockStore) ListProducts(ctx context.Context, arg db.ListProductsParams) ([]db.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListProducts", ctx, arg)
-	ret0, _ := ret[0].([]sqlc.Product)
+	ret0, _ := ret[0].([]db.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -263,10 +294,10 @@ func (mr *MockStoreMockRecorder) ListProducts(ctx, arg any) *gomock.Call {
 }
 
 // SoftDeleteOrder mocks base method.
-func (m *MockStore) SoftDeleteOrder(ctx context.Context, arg sqlc.SoftDeleteOrderParams) (sqlc.Order, error) {
+func (m *MockStore) SoftDeleteOrder(ctx context.Context, arg db.SoftDeleteOrderParams) (db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SoftDeleteOrder", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Order)
+	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -278,10 +309,10 @@ func (mr *MockStoreMockRecorder) SoftDeleteOrder(ctx, arg any) *gomock.Call {
 }
 
 // UpdateOrderStatus mocks base method.
-func (m *MockStore) UpdateOrderStatus(ctx context.Context, arg sqlc.UpdateOrderStatusParams) (sqlc.Order, error) {
+func (m *MockStore) UpdateOrderStatus(ctx context.Context, arg db.UpdateOrderStatusParams) (db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateOrderStatus", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Order)
+	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -293,10 +324,10 @@ func (mr *MockStoreMockRecorder) UpdateOrderStatus(ctx, arg any) *gomock.Call {
 }
 
 // UpdateProduct mocks base method.
-func (m *MockStore) UpdateProduct(ctx context.Context, arg sqlc.UpdateProductParams) (sqlc.Product, error) {
+func (m *MockStore) UpdateProduct(ctx context.Context, arg db.UpdateProductParams) (db.Product, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateProduct", ctx, arg)
-	ret0, _ := ret[0].(sqlc.Product)
+	ret0, _ := ret[0].(db.Product)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
