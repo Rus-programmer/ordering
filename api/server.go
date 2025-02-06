@@ -60,4 +60,5 @@ func errorResponse(err error) gin.H {
 func (server *Server) setupRouter() {
 	server.router.POST("/users", server.createCustomer)
 	server.router.POST("/login", server.login)
+	server.router.POST("/tokens/renew_access", server.renewAccessToken)
 }
