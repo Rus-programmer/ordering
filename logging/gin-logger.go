@@ -56,11 +56,6 @@ func GinLogger() gin.HandlerFunc {
 		// statusCode field
 		event.Int(statusCodeFieldName, ginInfo.StatusCode)
 
-		// Payload field
-		if len(ginInfo.Payload) > 0 {
-			event.Str(PayloadFieldName, string(ginInfo.Payload))
-		}
-
 		// Duration field
 		var durationFieldName string
 		switch zerolog.DurationFieldUnit {
@@ -81,11 +76,6 @@ func GinLogger() gin.HandlerFunc {
 			durationFieldName = DurationFieldName
 		}
 		event.Dur(durationFieldName, ginInfo.Duration)
-
-		// Body field
-		if len(ginInfo.Body) > 0 {
-			event.Str(BodyFieldName, ginInfo.Body)
-		}
 
 		// Message
 		message := ctx.Errors.String()

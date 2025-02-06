@@ -1,17 +1,24 @@
 package api
 
 import (
+	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/require"
 	db "ordering/db/sqlc"
 	"ordering/utils"
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {
-	server, err := NewServer(util.Config{}, store)
+	config := util.Config{
+		TokenSymmetricKey:   util.RandomString(32),
+		AccessTokenDuration: time.Minute,
+		Environment:         "test",
+	}
+
+	server, err := NewServer(config, store)
 	require.NoError(t, err)
 
 	return server

@@ -11,9 +11,7 @@ type LogInfo struct {
 	Duration   time.Duration
 	Method     string
 	Path       string
-	Payload    []byte
 	StatusCode int
-	Body       string
 	BeginTime  time.Time
 }
 
@@ -42,8 +40,6 @@ func ExtractInfoFromGinContext(ctx *gin.Context) *LogInfo {
 		StatusCode: ctx.Writer.Status(),
 		Method:     ctx.Request.Method,
 		Path:       path,
-		Payload:    payload,
-		Body:       w.body.String(),
 		BeginTime:  begin,
 	}
 }
