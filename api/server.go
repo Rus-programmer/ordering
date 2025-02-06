@@ -61,4 +61,8 @@ func (server *Server) setupRouter() {
 	server.router.POST("/users", server.createCustomer)
 	server.router.POST("/login", server.login)
 	server.router.POST("/tokens/renew_access", server.renewAccessToken)
+
+	authRoutes := server.router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes.GET("/products/:id", server.getProduct)
+	authRoutes.GET("/products", server.listProducts)
 }
