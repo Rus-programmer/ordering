@@ -181,8 +181,134 @@ func requireBodyMatchProducts(t *testing.T, body *bytes.Buffer, products []db.Pr
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotAccounts []db.Product
-	err = json.Unmarshal(data, &gotAccounts)
+	var gotProducts []db.Product
+	err = json.Unmarshal(data, &gotProducts)
 	require.NoError(t, err)
-	require.Equal(t, products, gotAccounts)
+	require.Equal(t, products, gotProducts)
+}
+
+func TestGetProductAPI(t *testing.T) {
+	user, _ := randomUser(t)
+	product := randomProduct()
+
+	testCases := []struct {
+		name          string
+		productID     int64
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recoder *httptest.ResponseRecorder)
+	}{
+		{
+			name:      "OK",
+			productID: product.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Eq(product.ID)).
+					Times(1).
+					Return(product, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchProduct(t, recorder.Body, product)
+			},
+		},
+		{
+			name:      "NoAuthorization",
+			productID: product.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name:      "NotFound",
+			productID: product.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+			},
+
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Eq(product.ID)).
+					Times(1).
+					Return(db.Product{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name:      "InternalError",
+			productID: product.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Eq(product.ID)).
+					Times(1).
+					Return(db.Product{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:      "InvalidID",
+			productID: 0,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.ID, user.Role, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetProduct(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := newTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := fmt.Sprintf("/products/%d", tc.productID)
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+func requireBodyMatchProduct(t *testing.T, body *bytes.Buffer, product db.Product) {
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
+
+	var gotProduct db.Product
+	err = json.Unmarshal(data, &gotProduct)
+	require.NoError(t, err)
+	require.Equal(t, product, gotProduct)
 }
