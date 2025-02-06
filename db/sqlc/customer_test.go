@@ -17,7 +17,7 @@ func TestCreateCustomer(t *testing.T) {
 
 func createRandomCustomer(t *testing.T) Customer {
 	arg := CreateCustomerParams{
-		Username:       util.RandomOwner(),
+		Username:       util.RandomCustomer(),
 		HashedPassword: util.RandomString(6),
 		Role:           UserRoleUser,
 	}
