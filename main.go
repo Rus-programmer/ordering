@@ -7,6 +7,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"ordering/api"
 	db "ordering/db/sqlc"
+	"ordering/middleware"
+	"ordering/services"
+	"ordering/token"
 	util "ordering/util"
 	"os"
 )
@@ -21,14 +24,21 @@ func main() {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Can't create token maker")
+	}
+
 	pool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Can't connect to database")
 	}
 
 	store := db.NewStore(pool)
+	newMiddleware := middleware.NewMiddleware(store, tokenMaker)
+	newService := services.NewService(config, store, tokenMaker)
 
-	server, err := api.NewServer(config, store)
+	server, err := api.NewServer(config, newMiddleware, newService)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Can't create server")
 	}

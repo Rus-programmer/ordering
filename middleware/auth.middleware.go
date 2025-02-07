@@ -4,18 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"ordering/common"
 	util "ordering/util"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"ordering/token"
 )
 
 // Auth creates a gin middleware for authorization
-func Auth(tokenMaker token.Maker) gin.HandlerFunc {
+func (middleware *middlewareImpl) Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.GetHeader(common.AuthorizationHeaderKey)
+		authorizationHeader := ctx.GetHeader(AuthorizationHeaderKey)
 
 		if len(authorizationHeader) == 0 {
 			err := errors.New("authorization header is not provided")
@@ -31,20 +29,20 @@ func Auth(tokenMaker token.Maker) gin.HandlerFunc {
 		}
 
 		authorizationType := strings.ToLower(fields[0])
-		if authorizationType != common.AuthorizationTypeBearer {
+		if authorizationType != AuthorizationTypeBearer {
 			err := fmt.Errorf("unsupported authorization type %s", authorizationType)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, util.ErrorResponse(err))
 			return
 		}
 
 		accessToken := fields[1]
-		payload, err := tokenMaker.VerifyToken(accessToken)
+		payload, err := middleware.tokenMaker.VerifyToken(accessToken)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, util.ErrorResponse(err))
 			return
 		}
 
-		ctx.Set(common.AuthorizationPayloadKey, payload)
+		ctx.Set(AuthorizationPayloadKey, payload)
 		ctx.Next()
 	}
 }

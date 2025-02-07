@@ -1,11 +1,10 @@
 package api
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	db "ordering/db/sqlc"
-	util "ordering/util"
+	"ordering/services/products"
+	"ordering/util"
 )
 
 type listProductRequest struct {
@@ -20,18 +19,18 @@ func (server *Server) listProducts(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.ListProductsParams{
+	arg := products.ListProductRequest{
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
-	products, err := server.store.ListProducts(ctx, arg)
+	listProduct, err := server.service.ListProducts(ctx, arg)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+		ctx.JSON(util.ErrorHandler(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, products)
+	ctx.JSON(http.StatusOK, listProduct)
 }
 
 type getProductRequest struct {
@@ -45,14 +44,9 @@ func (server *Server) getProduct(ctx *gin.Context) {
 		return
 	}
 
-	product, err := server.store.GetProduct(ctx, req.ID)
+	product, err := server.service.GetProduct(ctx, req.ID)
 	if err != nil {
-		if errors.Is(err, db.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, util.ErrorResponse(err))
-			return
-		}
-
-		ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+		ctx.JSON(util.ErrorHandler(err))
 		return
 	}
 

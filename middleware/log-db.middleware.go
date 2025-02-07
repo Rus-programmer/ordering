@@ -9,7 +9,7 @@ import (
 )
 
 // LogDB creates a gin middleware for inserting logs to db
-func LogDB(store db.Store) gin.HandlerFunc {
+func (middleware *middlewareImpl) LogDB() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ginInfo := logging.ExtractInfoFromGinContext(ctx)
 
@@ -22,7 +22,7 @@ func LogDB(store db.Store) gin.HandlerFunc {
 		}
 
 		go func() {
-			err := store.CreateLog(context.Background(), arg)
+			err := middleware.store.CreateLog(context.Background(), arg)
 			if err != nil {
 				log.Error().Err(err).Msg("Cannot create log")
 			}

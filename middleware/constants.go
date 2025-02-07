@@ -1,4 +1,4 @@
-package common
+package middleware
 
 const (
 	AuthorizationHeaderKey  = "authorization"

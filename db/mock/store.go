@@ -173,6 +173,21 @@ func (mr *MockStoreMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockStore)(nil).DeleteProduct), ctx, id)
 }
 
+// GetCustomer mocks base method.
+func (m *MockStore) GetCustomer(ctx context.Context, id int64) (db.Customer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCustomer", ctx, id)
+	ret0, _ := ret[0].(db.Customer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCustomer indicates an expected call of GetCustomer.
+func (mr *MockStoreMockRecorder) GetCustomer(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCustomer", reflect.TypeOf((*MockStore)(nil).GetCustomer), ctx, id)
+}
+
 // GetCustomerByUsername mocks base method.
 func (m *MockStore) GetCustomerByUsername(ctx context.Context, username string) (db.Customer, error) {
 	m.ctrl.T.Helper()

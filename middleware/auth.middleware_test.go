@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"net/http"
 	"net/http/httptest"
-	"ordering/common"
 	db "ordering/db/sqlc"
 	test_utils "ordering/test-utils"
 	"testing"
@@ -34,7 +34,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "OK",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, customerID, role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, AuthorizationTypeBearer, customerID, role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -69,7 +69,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "ExpiredToken",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				test_utils.AddAuthorization(t, request, tokenMaker, common.AuthorizationTypeBearer, customerID, role, -time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, AuthorizationTypeBearer, customerID, role, -time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -81,12 +81,18 @@ func TestAuthMiddleware(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
 			gin.SetMode(gin.TestMode)
 			r := gin.New()
+
+			middleware := NewMiddleware(nil, tokenMaker)
+
 			authPath := "/auth"
 			r.GET(
 				authPath,
-				Auth(tokenMaker),
+				middleware.Auth(),
 				func(ctx *gin.Context) {
 					ctx.JSON(http.StatusOK, gin.H{})
 				},

@@ -21,9 +21,11 @@ func TestLogDB(t *testing.T) {
 
 	mockStore := mockdb.NewMockStore(ctrl)
 
+	newMiddleware := NewMiddleware(mockStore, nil)
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.Use(LogDB(mockStore))
+
+	r.Use(newMiddleware.LogDB())
 
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
