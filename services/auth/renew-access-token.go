@@ -16,7 +16,7 @@ func (auth *auth) RenewAccessToken(ctx context.Context, refreshToken string) (dt
 
 	session, err := auth.store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
-		return dto.RenewAccessTokenResponse{}, err
+		return dto.RenewAccessTokenResponse{}, util.ErrBlockedSession
 	}
 
 	if session.IsBlocked {
