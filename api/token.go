@@ -20,6 +20,7 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 	rsp, err := server.service.RenewAccessToken(ctx, req.RefreshToken)
 	if err != nil {
 		ctx.JSON(util.ErrorHandler(err))
+		return
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

@@ -60,4 +60,6 @@ func (server *Server) setupRouter() {
 	authRoutes := server.router.Group("/").Use(server.middleware.Auth())
 	authRoutes.GET("/products/:id", server.getProduct)
 	authRoutes.GET("/products", server.listProducts)
+	authRoutes.PUT("/products/:id", server.updateProduct)
+	authRoutes.DELETE("/products/:id", server.deleteProduct)
 }

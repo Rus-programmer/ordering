@@ -11,6 +11,8 @@ import (
 type Product interface {
 	ListProducts(ctx context.Context, req ListProductRequest) ([]dto.ProductResponse, error)
 	GetProduct(ctx context.Context, id int64) (dto.ProductResponse, error)
+	UpdateProduct(ctx context.Context, id int64, body UpdateProduct) (dto.ProductResponse, error)
+	DeleteProduct(ctx context.Context, id int64) error
 }
 
 type product struct {

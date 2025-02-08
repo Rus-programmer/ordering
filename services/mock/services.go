@@ -60,6 +60,20 @@ func (mr *MockServiceMockRecorder) CreateCustomer(ctx, req any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCustomer", reflect.TypeOf((*MockService)(nil).CreateCustomer), ctx, req)
 }
 
+// DeleteProduct mocks base method.
+func (m *MockService) DeleteProduct(ctx context.Context, id int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteProduct", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteProduct indicates an expected call of DeleteProduct.
+func (mr *MockServiceMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockService)(nil).DeleteProduct), ctx, id)
+}
+
 // GetProduct mocks base method.
 func (m *MockService) GetProduct(ctx context.Context, id int64) (dto.ProductResponse, error) {
 	m.ctrl.T.Helper()
@@ -132,4 +146,19 @@ func (m *MockService) RenewAccessToken(ctx context.Context, refreshToken string)
 func (mr *MockServiceMockRecorder) RenewAccessToken(ctx, refreshToken any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenewAccessToken", reflect.TypeOf((*MockService)(nil).RenewAccessToken), ctx, refreshToken)
+}
+
+// UpdateProduct mocks base method.
+func (m *MockService) UpdateProduct(ctx context.Context, id int64, body products.UpdateProduct) (dto.ProductResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProduct", ctx, id, body)
+	ret0, _ := ret[0].(dto.ProductResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProduct indicates an expected call of UpdateProduct.
+func (mr *MockServiceMockRecorder) UpdateProduct(ctx, id, body any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProduct", reflect.TypeOf((*MockService)(nil).UpdateProduct), ctx, id, body)
 }
