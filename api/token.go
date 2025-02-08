@@ -1,20 +1,13 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"ordering/util"
-	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type renewAccessTokenRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
-}
-
-type RenewAccessTokenResponse struct {
-	AccessToken          string    `json:"access_token"`
-	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
 }
 
 func (server *Server) renewAccessToken(ctx *gin.Context) {
