@@ -57,8 +57,6 @@ func ErrorHandler(err error) (int, gin.H) {
 		return http.StatusUnauthorized, ErrorResponse(err)
 	case errors.Is(err, ErrRecordNotFound):
 		return http.StatusNotFound, ErrorResponse(err)
-	case errors.Is(err, ErrRecordNotFound):
-		return http.StatusNotFound, ErrorResponse(err)
 	}
 
 	errCode := ErrorCode(err)
