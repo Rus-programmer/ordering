@@ -1,39 +1,30 @@
-package api
+package middleware
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"net/http"
 	"net/http/httptest"
 	db "ordering/db/sqlc"
+	test_utils "ordering/test-utils"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"ordering/token"
-	"ordering/utils"
+	"ordering/util"
 )
-
-func addAuthorization(
-	t *testing.T,
-	request *http.Request,
-	tokenMaker token.Maker,
-	authorizationType string,
-	customerID int64,
-	role db.UserRole,
-	duration time.Duration,
-) {
-	createdToken, payload, err := tokenMaker.CreateToken(customerID, string(role), duration)
-	require.NoError(t, err)
-	require.NotEmpty(t, payload)
-
-	authorizationHeader := fmt.Sprintf("%s %s", authorizationType, createdToken)
-	request.Header.Set(authorizationHeaderKey, authorizationHeader)
-}
 
 func TestAuthMiddleware(t *testing.T) {
 	customerID := util.RandomInt(1, 100)
 	role := db.UserRoleUser
+
+	tokenMaker, err := token.NewPasetoMaker("12345678901234567890123456789012")
+	assert.NoError(t, err)
+
+	_, _, err = tokenMaker.CreateToken(customerID, string(role), time.Minute)
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -43,7 +34,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "OK",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, customerID, role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, AuthorizationTypeBearer, customerID, role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -60,7 +51,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "UnsupportedAuthorization",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "unsupported", customerID, role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, "unsupported", customerID, role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -69,7 +60,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "InvalidAuthorizationFormat",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "", customerID, role, time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, "", customerID, role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -78,7 +69,7 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "ExpiredToken",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, customerID, role, -time.Minute)
+				test_utils.AddAuthorization(t, request, tokenMaker, AuthorizationTypeBearer, customerID, role, -time.Minute)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -90,11 +81,18 @@ func TestAuthMiddleware(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			server := newTestServer(t, nil)
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			gin.SetMode(gin.TestMode)
+			r := gin.New()
+
+			middleware := NewMiddleware(nil, tokenMaker)
+
 			authPath := "/auth"
-			server.router.GET(
+			r.GET(
 				authPath,
-				authMiddleware(server.tokenMaker),
+				middleware.Auth(),
 				func(ctx *gin.Context) {
 					ctx.JSON(http.StatusOK, gin.H{})
 				},
@@ -104,8 +102,8 @@ func TestAuthMiddleware(t *testing.T) {
 			request, err := http.NewRequest(http.MethodGet, authPath, nil)
 			require.NoError(t, err)
 
-			tc.setupAuth(t, request, server.tokenMaker)
-			server.router.ServeHTTP(recorder, request)
+			tc.setupAuth(t, request, tokenMaker)
+			r.ServeHTTP(recorder, request)
 			tc.checkResponse(t, recorder)
 		})
 	}

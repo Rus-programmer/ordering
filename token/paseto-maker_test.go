@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"ordering/utils"
+	"ordering/util"
 )
 
 func TestPasetoMaker(t *testing.T) {
