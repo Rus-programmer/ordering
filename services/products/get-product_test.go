@@ -16,14 +16,7 @@ import (
 func TestGetProduct(t *testing.T) {
 	ID := util.RandomInt(1, 100)
 
-	expectedProduct := db.Product{
-		ID:        ID,
-		Name:      "Test Product",
-		Price:     util.RandomInt(10, 1000),
-		Quantity:  util.RandomInt(1, 100),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	expectedProduct := randomProduct()
 
 	testCases := []struct {
 		name          string
@@ -89,5 +82,16 @@ func TestGetProduct(t *testing.T) {
 
 			tc.checkResponse(product, err)
 		})
+	}
+}
+
+func randomProduct() db.Product {
+	return db.Product{
+		ID:        util.RandomInt(10, 1000),
+		Name:      util.RandomString(10),
+		Price:     util.RandomInt(10, 1000),
+		Quantity:  util.RandomInt(1, 100),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
