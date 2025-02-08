@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	mockdb "ordering/db/mock"
 	"ordering/token"
@@ -10,21 +9,20 @@ import (
 	"time"
 )
 
-func newTestAuth(t *testing.T) (Auth, *mockdb.MockStore) {
+func newTestAuth(t *testing.T) (Auth, *mockdb.MockStore, *token.MockMaker) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	store := mockdb.NewMockStore(ctrl)
-	mockTokenMaker, err := token.NewPasetoMaker("12345678912345678912345678900032")
-	require.NoError(t, err)
+	tokenMaker := token.NewMockMaker(ctrl)
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
 
 	return &auth{
-		tokenMaker: mockTokenMaker,
+		tokenMaker: tokenMaker,
 		store:      store,
 		config:     config,
-	}, store
+	}, store, tokenMaker
 }

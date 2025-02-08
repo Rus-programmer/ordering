@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"ordering/dto"
-	"ordering/token"
 	"ordering/util"
 	"time"
 )
@@ -11,7 +10,7 @@ import (
 func (auth *auth) RenewAccessToken(ctx context.Context, refreshToken string) (dto.RenewAccessTokenResponse, error) {
 	refreshPayload, err := auth.tokenMaker.VerifyToken(refreshToken)
 	if err != nil {
-		return dto.RenewAccessTokenResponse{}, token.ErrInvalidToken
+		return dto.RenewAccessTokenResponse{}, util.ErrInvalidToken
 	}
 
 	session, err := auth.store.GetSession(ctx, refreshPayload.ID)
