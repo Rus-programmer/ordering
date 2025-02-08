@@ -37,6 +37,7 @@ mock:
 	mockgen -package mockdb -destination db/mock/store.go ordering/db/sqlc Store
 	mockgen -package mockMiddleware -destination middleware/mock/middleware.go ordering/middleware Middleware
 	mockgen -package mockService -destination services/mock/services.go ordering/services Service
+	mockgen -package token -destination token/mockMaker.go ordering/token Maker
 
 test:
 	go test -v -cover -short ./...
