@@ -63,4 +63,6 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/products/:id", server.updateProduct)
 	authRoutes.DELETE("/products/:id", server.deleteProduct)
 	authRoutes.POST("/products", server.createProduct)
+
+	authRoutes.GET("/orders/:id", server.getOrder)
 }

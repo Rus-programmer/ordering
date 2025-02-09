@@ -125,9 +125,9 @@ type Order struct {
 }
 
 type OrderProduct struct {
-	OrderID   int64 `json:"order_id"`
-	ProductID int64 `json:"product_id"`
-	Quantity  int64 `json:"quantity"`
+	OrderID       int64 `json:"order_id"`
+	ProductID     int64 `json:"product_id"`
+	OrderedAmount int64 `json:"ordered_amount"`
 }
 
 type Product struct {

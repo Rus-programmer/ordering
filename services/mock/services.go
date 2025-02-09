@@ -14,6 +14,7 @@ import (
 	dto "ordering/dto"
 	auth "ordering/services/auth"
 	customers "ordering/services/customers"
+	order "ordering/services/orders"
 	products "ordering/services/products"
 	token "ordering/token"
 	reflect "reflect"
@@ -87,6 +88,21 @@ func (m *MockService) DeleteProduct(ctx context.Context, id int64) error {
 func (mr *MockServiceMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockService)(nil).DeleteProduct), ctx, id)
+}
+
+// GetOrder mocks base method.
+func (m *MockService) GetOrder(ctx context.Context, req order.GetOrder) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrder indicates an expected call of GetOrder.
+func (mr *MockServiceMockRecorder) GetOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrder", reflect.TypeOf((*MockService)(nil).GetOrder), ctx, req)
 }
 
 // GetProduct mocks base method.

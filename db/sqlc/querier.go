@@ -22,6 +22,7 @@ type Querier interface {
 	DeleteProduct(ctx context.Context, id int64) error
 	GetCustomerByUsername(ctx context.Context, username string) (Customer, error)
 	GetOrder(ctx context.Context, arg GetOrderParams) (Order, error)
+	GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetTotalPrice(ctx context.Context, orderID int64) (int64, error)

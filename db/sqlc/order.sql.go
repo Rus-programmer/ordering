@@ -32,9 +32,9 @@ func (q *Queries) CreateOrder(ctx context.Context, customerID int64) (Order, err
 }
 
 type CreateOrderProductsParams struct {
-	OrderID   int64 `json:"order_id"`
-	ProductID int64 `json:"product_id"`
-	Quantity  int64 `json:"quantity"`
+	OrderID       int64 `json:"order_id"`
+	ProductID     int64 `json:"product_id"`
+	OrderedAmount int64 `json:"ordered_amount"`
 }
 
 const deleteOrder = `-- name: DeleteOrder :exec
@@ -70,8 +70,32 @@ func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (Order, erro
 	return i, err
 }
 
+const getOrderProducts = `-- name: GetOrderProducts :many
+SELECT order_id, product_id, ordered_amount FROM order_products where order_id=$1
+`
+
+func (q *Queries) GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error) {
+	rows, err := q.db.Query(ctx, getOrderProducts, orderID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []OrderProduct{}
+	for rows.Next() {
+		var i OrderProduct
+		if err := rows.Scan(&i.OrderID, &i.ProductID, &i.OrderedAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTotalPrice = `-- name: GetTotalPrice :one
-SELECT SUM(p.price * op.quantity)
+SELECT SUM(p.price * op.ordered_amount)
 FROM order_products op
 JOIN products p ON op.product_id = p.id
 WHERE op.order_id = $1

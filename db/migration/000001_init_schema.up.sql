@@ -35,7 +35,7 @@ CREATE TABLE order_products
 (
     order_id   BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
     product_id BIGINT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    quantity   BIGINT NOT NULL CHECK (quantity > 0),
+    ordered_amount   BIGINT NOT NULL CHECK (ordered_amount > 0),
     PRIMARY KEY (order_id, product_id)
 );
 
