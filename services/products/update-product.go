@@ -9,11 +9,7 @@ import (
 	"ordering/util"
 )
 
-type UpdateProduct struct {
-	Name     string
-	Price    int64
-	Quantity int64
-}
+type UpdateProduct ProductInput
 
 func (product *product) UpdateProduct(ctx context.Context, id int64, body UpdateProduct) (dto.ProductResponse, error) {
 	_, err := product.store.GetProduct(ctx, id)

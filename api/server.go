@@ -62,4 +62,5 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/products", server.listProducts)
 	authRoutes.PUT("/products/:id", server.updateProduct)
 	authRoutes.DELETE("/products/:id", server.deleteProduct)
+	authRoutes.POST("/products", server.createProduct)
 }
