@@ -13,6 +13,7 @@ type Product interface {
 	GetProduct(ctx context.Context, id int64) (dto.ProductResponse, error)
 	UpdateProduct(ctx context.Context, id int64, body UpdateProduct) (dto.ProductResponse, error)
 	DeleteProduct(ctx context.Context, id int64) error
+	CreateProduct(ctx context.Context, body CreateProduct) (dto.ProductResponse, error)
 }
 
 type product struct {

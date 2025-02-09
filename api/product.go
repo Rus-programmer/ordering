@@ -108,3 +108,29 @@ func (server *Server) deleteProduct(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, nil)
 }
+
+type createProductRequestBody struct {
+	Name     string `form:"name" binding:"required"`
+	Price    int64  `form:"price" binding:"required,min=1"`
+	Quantity int64  `form:"quantity" binding:"required,min=1"`
+}
+
+func (server *Server) createProduct(ctx *gin.Context) {
+	var bodyReq createProductRequestBody
+	if err := ctx.ShouldBindJSON(&bodyReq); err != nil {
+		ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+		return
+	}
+
+	product, err := server.service.CreateProduct(ctx, products.CreateProduct{
+		Name:     bodyReq.Name,
+		Price:    bodyReq.Price,
+		Quantity: bodyReq.Quantity,
+	})
+	if err != nil {
+		ctx.JSON(util.ErrorHandler(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
+}
