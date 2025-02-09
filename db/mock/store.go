@@ -72,18 +72,18 @@ func (mr *MockStoreMockRecorder) CreateLog(ctx, arg any) *gomock.Call {
 }
 
 // CreateOrder mocks base method.
-func (m *MockStore) CreateOrder(ctx context.Context, customerID int64) (db.Order, error) {
+func (m *MockStore) CreateOrder(ctx context.Context, arg db.CreateOrderParams) (db.Order, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateOrder", ctx, customerID)
+	ret := m.ctrl.Call(m, "CreateOrder", ctx, arg)
 	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateOrder indicates an expected call of CreateOrder.
-func (mr *MockStoreMockRecorder) CreateOrder(ctx, customerID any) *gomock.Call {
+func (mr *MockStoreMockRecorder) CreateOrder(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockStore)(nil).CreateOrder), ctx, customerID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockStore)(nil).CreateOrder), ctx, arg)
 }
 
 // CreateOrderProducts mocks base method.
@@ -279,18 +279,18 @@ func (mr *MockStoreMockRecorder) ListCustomers(ctx, arg any) *gomock.Call {
 }
 
 // ListOrders mocks base method.
-func (m *MockStore) ListOrders(ctx context.Context, customerID int64) ([]db.Order, error) {
+func (m *MockStore) ListOrders(ctx context.Context, arg db.ListOrdersParams) ([]int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListOrders", ctx, customerID)
-	ret0, _ := ret[0].([]db.Order)
+	ret := m.ctrl.Call(m, "ListOrders", ctx, arg)
+	ret0, _ := ret[0].([]int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListOrders indicates an expected call of ListOrders.
-func (mr *MockStoreMockRecorder) ListOrders(ctx, customerID any) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListOrders(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrders", reflect.TypeOf((*MockStore)(nil).ListOrders), ctx, customerID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrders", reflect.TypeOf((*MockStore)(nil).ListOrders), ctx, arg)
 }
 
 // ListProducts mocks base method.

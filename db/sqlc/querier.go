@@ -13,7 +13,7 @@ import (
 type Querier interface {
 	CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error)
 	CreateLog(ctx context.Context, arg CreateLogParams) error
-	CreateOrder(ctx context.Context, customerID int64) (Order, error)
+	CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error)
 	CreateOrderProducts(ctx context.Context, arg []CreateOrderProductsParams) (int64, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
@@ -27,7 +27,7 @@ type Querier interface {
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetTotalPrice(ctx context.Context, orderID int64) (int64, error)
 	ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error)
-	ListOrders(ctx context.Context, customerID int64) ([]Order, error)
+	ListOrders(ctx context.Context, arg ListOrdersParams) ([]int64, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	SoftDeleteOrder(ctx context.Context, arg SoftDeleteOrderParams) (Order, error)
 	UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error)

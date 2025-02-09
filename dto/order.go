@@ -5,6 +5,16 @@ import (
 	"time"
 )
 
+type ListOrderQueries struct {
+	Status   db.OrderStatus `form:"status" binding:"omitempty"`
+	MinPrice int64          `form:"min_price" binding:"omitempty,number,min=1"`
+	MaxPrice int64          `form:"max_price" binding:"omitempty,number,min=1"`
+}
+
+type GetOrderRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
 type OrderProductResponse struct {
 	Product       ProductResponse `json:"product"`
 	OrderedAmount int64           `json:"ordered_amount"`

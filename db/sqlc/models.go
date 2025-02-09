@@ -118,6 +118,7 @@ type Log struct {
 type Order struct {
 	ID         int64       `json:"id"`
 	CustomerID int64       `json:"customer_id"`
+	TotalPrice int64       `json:"total_price"`
 	Status     OrderStatus `json:"status"`
 	IsDeleted  bool        `json:"is_deleted"`
 	CreatedAt  time.Time   `json:"created_at"`

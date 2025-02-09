@@ -15,6 +15,7 @@ CREATE TABLE orders
 (
     id          BIGSERIAL PRIMARY KEY,
     customer_id BIGINT       NOT NULL REFERENCES customers (id) ON DELETE SET NULL,
+    total_price BIGINT       NOT NULL DEFAULT 0,
     status      order_status NOT NULL DEFAULT 'pending',
     is_deleted  BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
@@ -33,9 +34,9 @@ CREATE TABLE products
 
 CREATE TABLE order_products
 (
-    order_id   BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
-    product_id BIGINT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
-    ordered_amount   BIGINT NOT NULL CHECK (ordered_amount > 0),
+    order_id       BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
+    product_id     BIGINT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
+    ordered_amount BIGINT NOT NULL CHECK (ordered_amount > 0),
     PRIMARY KEY (order_id, product_id)
 );
 

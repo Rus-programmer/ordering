@@ -58,6 +58,10 @@ func (o *order) GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, 
 		return dto.OrderResponse{}, err
 	}
 
+	if totalPrice != order.TotalPrice {
+		return dto.OrderResponse{}, util.ErrMismatchedData
+	}
+
 	return dto.OrderResponse{
 		ID:         order.ID,
 		CustomerID: order.CustomerID,

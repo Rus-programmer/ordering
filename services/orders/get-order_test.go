@@ -33,8 +33,6 @@ func TestGetOrder(t *testing.T) {
 		product1, product2,
 	}
 
-	totalPrice := int64(1000)
-
 	testCases := []struct {
 		name          string
 		req           GetOrder
@@ -54,13 +52,13 @@ func TestGetOrder(t *testing.T) {
 				store.EXPECT().GetOrder(gomock.Any(), gomock.Any()).Times(1).Return(expectedOrder, nil)
 				store.EXPECT().GetOrderProducts(gomock.Any(), expectedOrder.ID).Times(1).Return(orderProducts, nil)
 				store.EXPECT().GetProduct(gomock.Any(), products[0].ID).Times(1).Return(products[0], nil)
-				store.EXPECT().GetTotalPrice(gomock.Any(), expectedOrder.ID).Times(1).Return(totalPrice, nil)
+				store.EXPECT().GetTotalPrice(gomock.Any(), expectedOrder.ID).Times(1).Return(expectedOrder.TotalPrice, nil)
 			},
 			checkResponse: func(order dto.OrderResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, expectedOrder.ID, order.ID)
 				require.Equal(t, expectedOrder.CustomerID, order.CustomerID)
-				require.Equal(t, totalPrice, order.TotalPrice)
+				require.Equal(t, expectedOrder.TotalPrice, order.TotalPrice)
 			},
 		},
 		{
@@ -76,13 +74,13 @@ func TestGetOrder(t *testing.T) {
 				store.EXPECT().GetOrder(gomock.Any(), gomock.Any()).Times(1).Return(expectedOrder, nil)
 				store.EXPECT().GetOrderProducts(gomock.Any(), expectedOrder.ID).Times(1).Return(orderProducts, nil)
 				store.EXPECT().GetProduct(gomock.Any(), products[0].ID).Times(1).Return(products[0], nil)
-				store.EXPECT().GetTotalPrice(gomock.Any(), expectedOrder.ID).Times(1).Return(totalPrice, nil)
+				store.EXPECT().GetTotalPrice(gomock.Any(), expectedOrder.ID).Times(1).Return(expectedOrder.TotalPrice, nil)
 			},
 			checkResponse: func(order dto.OrderResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, expectedOrder.ID, order.ID)
 				require.Equal(t, expectedOrder.CustomerID, order.CustomerID)
-				require.Equal(t, totalPrice, order.TotalPrice)
+				require.Equal(t, expectedOrder.TotalPrice, order.TotalPrice)
 			},
 		},
 		{
@@ -108,10 +106,10 @@ func TestGetOrder(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			service, store := newTestOrder(t)
+			testOrder, store := newTestOrder(t)
 
 			tc.buildStubs(store)
-			order, err := service.GetOrder(context.Background(), tc.req)
+			order, err := testOrder.GetOrder(context.Background(), tc.req)
 
 			tc.checkResponse(order, err)
 		})
@@ -133,6 +131,7 @@ func randomOrder() db.Order {
 	return db.Order{
 		ID:         util.RandomInt(1, 100),
 		CustomerID: util.RandomInt(1, 100),
+		TotalPrice: util.RandomInt(10, 1000),
 		IsDeleted:  false,
 		Status:     "pending",
 		CreatedAt:  time.Now(),
