@@ -59,6 +59,7 @@ SELECT id, customer_id, total_price, status, is_deleted, created_at, updated_at
 FROM orders o
 WHERE o.id = $1
   and (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+  AND is_deleted = false
 `
 
 type GetOrderParams struct {
@@ -125,9 +126,10 @@ const listOrders = `-- name: ListOrders :many
 SELECT id
 FROM orders
 WHERE (customer_id = $1 OR EXISTS (SELECT 1 FROM customers WHERE id = $1 AND role = 'admin'))
-    AND ($2::order_status IS NULL OR status = $2)
-    AND ($3::bigint IS NULL OR total_price >= $3)
-    AND ($4::bigint IS NULL OR total_price <= $4)
+  AND ($2::order_status IS NULL OR status = $2)
+  AND ($3::bigint IS NULL OR total_price >= $3)
+  AND ($4::bigint IS NULL OR total_price <= $4)
+  AND is_deleted = false
 `
 
 type ListOrdersParams struct {

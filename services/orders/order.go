@@ -11,6 +11,7 @@ import (
 type Order interface {
 	GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, error)
 	ListOrders(ctx context.Context, req ListOrders) ([]dto.OrderResponse, error)
+	DeleteOrder(ctx context.Context, req DeleteOrderParams) error
 }
 
 type order struct {

@@ -15,6 +15,8 @@ type GetOrderRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+type DeleteOrderRequest GetOrderRequest
+
 type OrderProductResponse struct {
 	Product       ProductResponse `json:"product"`
 	OrderedAmount int64           `json:"ordered_amount"`

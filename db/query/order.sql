@@ -7,15 +7,17 @@ RETURNING *;
 SELECT id
 FROM orders
 WHERE (customer_id = $1 OR EXISTS (SELECT 1 FROM customers WHERE id = $1 AND role = 'admin'))
-    AND (sqlc.narg(status)::order_status IS NULL OR status = sqlc.narg(status))
-    AND (sqlc.narg(min_price)::bigint IS NULL OR total_price >= sqlc.narg(min_price))
-    AND (sqlc.narg(max_price)::bigint IS NULL OR total_price <= sqlc.narg(max_price));
+  AND (sqlc.narg(status)::order_status IS NULL OR status = sqlc.narg(status))
+  AND (sqlc.narg(min_price)::bigint IS NULL OR total_price >= sqlc.narg(min_price))
+  AND (sqlc.narg(max_price)::bigint IS NULL OR total_price <= sqlc.narg(max_price))
+  AND is_deleted = false;
 
 -- name: GetOrder :one
 SELECT *
 FROM orders o
 WHERE o.id = $1
-  and (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'));
+  and (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+  AND is_deleted = false;
 
 -- name: UpdateOrderStatus :one
 UPDATE orders o
