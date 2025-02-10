@@ -1,15 +1,16 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"ordering/logging"
 	"ordering/middleware"
 	"ordering/services"
 	"ordering/util"
 	"ordering/validators"
-
-	"github.com/gin-gonic/gin"
 )
 
 // Server serves HTTP requests for our ordering service.
@@ -55,9 +56,10 @@ func (server *Server) Start(address string) error {
 }
 
 func (server *Server) setupRouter() {
-	server.router.POST("/users", server.createCustomer)
+	server.router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	server.router.POST("/customers", server.createCustomer)
 	server.router.POST("/login", server.login)
-	server.router.POST("/tokens/renew_access", server.renewAccessToken)
+	server.router.POST("/renew_access", server.renewAccessToken)
 
 	authRoutes := server.router.Group("/").Use(server.middleware.Auth())
 	authRoutes.GET("/products/:id", server.getProduct)

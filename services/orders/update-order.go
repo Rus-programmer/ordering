@@ -1,6 +1,7 @@
 package order
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -8,6 +9,7 @@ import (
 	db "ordering/db/sqlc"
 	"ordering/dto"
 	"ordering/token"
+	"slices"
 	"sort"
 )
 
@@ -40,6 +42,9 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		if existingOrder.IsDeleted {
 			return fmt.Errorf("you can't update deleted order")
 		}
+
+		// sorting for prevent deadlocks
+		req.SortProductsByID()
 
 		// getting already existed products in order_products table
 		existingOrderProducts, err := q.GetOrderProducts(ctx, req.OrderID)
@@ -80,11 +85,12 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 				})
 			}
 		}
-
 		// left productIDs in existingMap should be deleted from db
 		for productID := range existingMap {
 			toDelete = append(toDelete, productID)
 		}
+		// sorting for prevent deadlocks
+		slices.SortFunc(toDelete, cmp.Compare[int64])
 
 		if len(toDelete) > 0 {
 			for _, productID := range toDelete {
@@ -110,14 +116,16 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 			}
 		}
 
-		// sorting for prevent deadlocks
-		req.SortProductsByID()
-
 		// getting already existed products in order_products table
 		updatedOrderProducts, err := q.GetOrderProducts(ctx, req.OrderID)
 		if err != nil {
 			return err
 		}
+
+		// sorting for prevent deadlocks
+		slices.SortFunc(existingOrderProducts, func(a, b db.OrderProduct) int {
+			return cmp.Compare(a.ProductID, b.ProductID)
+		})
 
 		totalPrice := int64(0)
 		for _, orderProduct := range updatedOrderProducts {
@@ -166,7 +174,7 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 			},
 			TotalPrice: pgtype.Int8{
 				Int64: totalPrice,
-				Valid: totalPrice != 0,
+				Valid: true,
 			},
 		})
 		if err != nil {

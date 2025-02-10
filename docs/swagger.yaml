@@ -1,0 +1,534 @@
+definitions:
+  api.createProductRequestBody:
+    properties:
+      name:
+        type: string
+      price:
+        minimum: 1
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - name
+    - price
+    - quantity
+    type: object
+  api.renewAccessTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  api.updateProductRequestBody:
+    properties:
+      name:
+        type: string
+      price:
+        minimum: 1
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+    type: object
+  db.OrderStatus:
+    enum:
+    - pending
+    - confirmed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - OrderStatusPending
+    - OrderStatusConfirmed
+    - OrderStatusCancelled
+  db.UserRole:
+    enum:
+    - user
+    - admin
+    type: string
+    x-enum-varnames:
+    - UserRoleUser
+    - UserRoleAdmin
+  dto.CreateCustomerRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      role:
+        $ref: '#/definitions/db.UserRole'
+      username:
+        type: string
+    required:
+    - password
+    - role
+    - username
+    type: object
+  dto.CreateOrderItem:
+    properties:
+      ordered_amount:
+        minimum: 1
+        type: integer
+      product_id:
+        minimum: 1
+        type: integer
+    required:
+    - ordered_amount
+    - product_id
+    type: object
+  dto.CreateOrderRequestBody:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/dto.CreateOrderItem'
+        type: array
+    required:
+    - products
+    type: object
+  dto.CustomerResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      role:
+        $ref: '#/definitions/db.UserRole'
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.LoginRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+      customer:
+        $ref: '#/definitions/dto.CustomerResponse'
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      session_id:
+        type: string
+    type: object
+  dto.MetricsResponse:
+    properties:
+      error_rate:
+        type: number
+      requests_by_method:
+        additionalProperties:
+          type: integer
+        type: object
+      requests_by_path:
+        additionalProperties:
+          type: integer
+        type: object
+      requests_by_status_code:
+        additionalProperties:
+          type: integer
+        type: object
+      total_requests:
+        type: integer
+    type: object
+  dto.OrderProductResponse:
+    properties:
+      ordered_amount:
+        type: integer
+      product:
+        $ref: '#/definitions/dto.ProductResponse'
+    type: object
+  dto.OrderResponse:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: integer
+      id:
+        type: integer
+      id_deleted:
+        type: boolean
+      products:
+        items:
+          $ref: '#/definitions/dto.OrderProductResponse'
+        type: array
+      status:
+        $ref: '#/definitions/db.OrderStatus'
+      total_price:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.ProductResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.RenewAccessTokenResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+    type: object
+  dto.UpdateOrderRequestBody:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/dto.CreateOrderItem'
+        type: array
+      status:
+        $ref: '#/definitions/db.OrderStatus'
+    required:
+    - products
+    type: object
+info:
+  contact: {}
+  description: This project is a backend service designed for managing orders
+  title: Ordering project
+  version: "1.0"
+paths:
+  /customers:
+    post:
+      consumes:
+      - application/json
+      description: Register a new customer with username, password, and role
+      parameters:
+      - description: Customer details
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CustomerResponse'
+      summary: Create a new customer
+      tags:
+      - customers
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+      summary: User login
+      tags:
+      - auth
+  /metrics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve various system metrics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MetricsResponse'
+      summary: Get system metrics
+      tags:
+      - metrics
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of orders with optional filters
+      parameters:
+      - description: Order status
+        in: query
+        name: status
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: integer
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OrderResponse'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: List orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with the provided products
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+      security:
+      - BearerAuth: []
+      summary: Create an order
+      tags:
+      - orders
+  /orders/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an order by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order deleted successfully
+      security:
+      - BearerAuth: []
+      summary: Delete an order
+      tags:
+      - orders
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an order's details by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+      security:
+      - BearerAuth: []
+      summary: Get an order by ID
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Update an existing order's details
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateOrderRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an order
+      tags:
+      - orders
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of products with pagination
+      parameters:
+      - description: Page ID
+        in: query
+        name: page_id
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductResponse'
+            type: array
+      summary: List products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product with the provided details
+      parameters:
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/api.createProductRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+      summary: Create a product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product deleted successfully
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a product's details by its ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+      summary: Get a product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update an existing product's details
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateProductRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+      summary: Update a product
+      tags:
+      - products
+  /renew_access:
+    post:
+      consumes:
+      - application/json
+      description: Refresh the access token using a valid refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.renewAccessTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RenewAccessTokenResponse'
+      summary: Renew access token
+      tags:
+      - auth
+swagger: "2.0"

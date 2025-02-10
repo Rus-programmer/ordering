@@ -10,6 +10,15 @@ type renewAccessTokenRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
+// renewAccessToken handles access token renewal.
+// @Summary Renew access token
+// @Description Refresh the access token using a valid refresh token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body renewAccessTokenRequest true "Refresh token request"
+// @Success 200 {object} dto.RenewAccessTokenResponse
+// @Router /renew_access [post]
 func (server *Server) renewAccessToken(ctx *gin.Context) {
 	var req renewAccessTokenRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
