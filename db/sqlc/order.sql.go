@@ -37,12 +37,6 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 	return i, err
 }
 
-type CreateOrderProductsParams struct {
-	OrderID       int64 `json:"order_id"`
-	ProductID     int64 `json:"product_id"`
-	OrderedAmount int64 `json:"ordered_amount"`
-}
-
 const deleteOrder = `-- name: DeleteOrder :exec
 DELETE
 FROM orders
@@ -80,46 +74,6 @@ func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (Order, erro
 		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const getOrderProducts = `-- name: GetOrderProducts :many
-SELECT order_id, product_id, ordered_amount
-FROM order_products
-where order_id = $1
-`
-
-func (q *Queries) GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error) {
-	rows, err := q.db.Query(ctx, getOrderProducts, orderID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []OrderProduct{}
-	for rows.Next() {
-		var i OrderProduct
-		if err := rows.Scan(&i.OrderID, &i.ProductID, &i.OrderedAmount); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getTotalPrice = `-- name: GetTotalPrice :one
-SELECT SUM(p.price * op.ordered_amount)
-FROM order_products op
-         JOIN products p ON op.product_id = p.id
-WHERE op.order_id = $1
-`
-
-func (q *Queries) GetTotalPrice(ctx context.Context, orderID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, getTotalPrice, orderID)
-	var sum int64
-	err := row.Scan(&sum)
-	return sum, err
 }
 
 const listOrders = `-- name: ListOrders :many
@@ -192,23 +146,30 @@ func (q *Queries) SoftDeleteOrder(ctx context.Context, arg SoftDeleteOrderParams
 	return i, err
 }
 
-const updateOrderStatus = `-- name: UpdateOrderStatus :one
+const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders o
-SET status     = $3,
-    updated_at = NOW()
+SET
+    status = COALESCE($3, status),
+    total_price = COALESCE($4, total_price)
 WHERE o.id = $1
   AND (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
 RETURNING id, customer_id, total_price, status, is_deleted, created_at, updated_at
 `
 
-type UpdateOrderStatusParams struct {
-	ID         int64       `json:"id"`
-	CustomerID int64       `json:"customer_id"`
-	Status     OrderStatus `json:"status"`
+type UpdateOrderParams struct {
+	ID         int64           `json:"id"`
+	CustomerID int64           `json:"customer_id"`
+	Status     NullOrderStatus `json:"status"`
+	TotalPrice pgtype.Int8     `json:"total_price"`
 }
 
-func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error) {
-	row := q.db.QueryRow(ctx, updateOrderStatus, arg.ID, arg.CustomerID, arg.Status)
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
+	row := q.db.QueryRow(ctx, updateOrder,
+		arg.ID,
+		arg.CustomerID,
+		arg.Status,
+		arg.TotalPrice,
+	)
 	var i Order
 	err := row.Scan(
 		&i.ID,

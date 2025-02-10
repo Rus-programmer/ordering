@@ -111,3 +111,40 @@ func (server *Server) createOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, newOrder)
 }
+
+func (server *Server) updateOrder(ctx *gin.Context) {
+	var req dto.UpdateOrderRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+		return
+	}
+
+	var bodyReq dto.UpdateOrderRequestBody
+	if err := ctx.ShouldBindJSON(&bodyReq); err != nil {
+		ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+		return
+	}
+
+	payload := ctx.MustGet(middleware.AuthorizationPayloadKey).(*token.Payload)
+
+	products := make([]order.UpdateOrderItem, len(bodyReq.Products))
+	for i, item := range bodyReq.Products {
+		products[i] = order.UpdateOrderItem{
+			ProductID:     item.ProductID,
+			OrderedAmount: item.OrderedAmount,
+		}
+	}
+
+	updatedOrder, err := server.service.UpdateOrder(ctx, order.UpdateOrderParams{
+		OrderID:  req.ID,
+		Status:   bodyReq.Status,
+		Payload:  payload,
+		Products: products,
+	})
+	if err != nil {
+		ctx.JSON(util.ErrorHandler(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedOrder)
+}

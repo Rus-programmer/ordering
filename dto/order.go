@@ -42,6 +42,11 @@ type CreateOrderItem struct {
 	OrderedAmount int64 `json:"ordered_amount" binding:"required,min=1"`
 }
 
+type UpdateOrderRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
 type UpdateOrderRequestBody struct {
+	Status   db.OrderStatus    `json:"status" binding:"omitempty,orderStatus"`
 	Products []CreateOrderItem `json:"products" binding:"required,notEmptyArray"`
 }

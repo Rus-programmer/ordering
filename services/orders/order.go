@@ -13,6 +13,7 @@ type Order interface {
 	ListOrders(ctx context.Context, req ListOrders) ([]dto.OrderResponse, error)
 	DeleteOrder(ctx context.Context, req DeleteOrderParams) error
 	CreateOrder(ctx context.Context, req CreateOrderParams) (dto.OrderResponse, error)
+	UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.OrderResponse, error)
 }
 
 type order struct {

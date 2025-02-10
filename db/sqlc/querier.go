@@ -19,18 +19,21 @@ type Querier interface {
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	DeleteCustomer(ctx context.Context, id int64) error
 	DeleteOrder(ctx context.Context, id int64) error
+	DeleteOrderProduct(ctx context.Context, arg DeleteOrderProductParams) error
 	DeleteProduct(ctx context.Context, id int64) error
 	GetCustomerByUsername(ctx context.Context, username string) (Customer, error)
 	GetOrder(ctx context.Context, arg GetOrderParams) (Order, error)
 	GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)
+	GetProductForUpdate(ctx context.Context, id int64) (Product, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetTotalPrice(ctx context.Context, orderID int64) (int64, error)
 	ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error)
 	ListOrders(ctx context.Context, arg ListOrdersParams) ([]int64, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	SoftDeleteOrder(ctx context.Context, arg SoftDeleteOrderParams) (Order, error)
-	UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error)
+	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
+	UpdateOrderProduct(ctx context.Context, arg UpdateOrderProductParams) (OrderProduct, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 }
 
