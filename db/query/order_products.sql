@@ -1,7 +1,8 @@
 -- name: GetOrderProducts :many
 SELECT *
 FROM order_products
-where order_id = $1;
+where order_id = $1
+ORDER BY product_id;
 
 -- name: GetTotalPrice :one
 SELECT SUM(p.price * op.ordered_amount)

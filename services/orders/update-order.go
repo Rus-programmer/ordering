@@ -1,7 +1,6 @@
 package order
 
 import (
-	"cmp"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -9,7 +8,6 @@ import (
 	db "ordering/db/sqlc"
 	"ordering/dto"
 	"ordering/token"
-	"slices"
 	"sort"
 )
 
@@ -89,8 +87,6 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		for productID := range existingMap {
 			toDelete = append(toDelete, productID)
 		}
-		// sorting for prevent deadlocks
-		slices.SortFunc(toDelete, cmp.Compare[int64])
 
 		if len(toDelete) > 0 {
 			for _, productID := range toDelete {
@@ -121,11 +117,6 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		if err != nil {
 			return err
 		}
-
-		// sorting for prevent deadlocks
-		slices.SortFunc(existingOrderProducts, func(a, b db.OrderProduct) int {
-			return cmp.Compare(a.ProductID, b.ProductID)
-		})
 
 		totalPrice := int64(0)
 		for _, orderProduct := range updatedOrderProducts {

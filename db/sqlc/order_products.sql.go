@@ -33,6 +33,7 @@ const getOrderProducts = `-- name: GetOrderProducts :many
 SELECT order_id, product_id, ordered_amount
 FROM order_products
 where order_id = $1
+ORDER BY product_id
 `
 
 func (q *Queries) GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error) {
