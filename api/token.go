@@ -10,14 +10,14 @@ type renewAccessTokenRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
-// createCustomer handles customer creation.
-// @Summary Create a new customer
-// @Description Register a new customer with username, password, and role
-// @Tags customers
+// renewAccessToken handles access token renewal.
+// @Summary Renew access token
+// @Description Refresh the access token using a valid refresh token
+// @Tags auth
 // @Accept json
 // @Produce json
-// @Param customer body dto.CreateCustomerRequest true "Customer details"
-// @Success 200 {object} dto.CustomerResponse
+// @Param request body renewAccessTokenRequest true "Refresh token request"
+// @Success 200 {object} dto.RenewAccessTokenResponse
 // @Router /renew_access [post]
 func (server *Server) renewAccessToken(ctx *gin.Context) {
 	var req renewAccessTokenRequest

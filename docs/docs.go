@@ -481,7 +481,7 @@ const docTemplate = `{
         },
         "/renew_access": {
             "post": {
-                "description": "Register a new customer with username, password, and role",
+                "description": "Refresh the access token using a valid refresh token",
                 "consumes": [
                     "application/json"
                 ],
@@ -489,17 +489,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "auth"
                 ],
-                "summary": "Create a new customer",
+                "summary": "Renew access token",
                 "parameters": [
                     {
-                        "description": "Customer details",
-                        "name": "customer",
+                        "description": "Refresh token request",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateCustomerRequest"
+                            "$ref": "#/definitions/api.renewAccessTokenRequest"
                         }
                     }
                 ],
@@ -507,7 +507,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CustomerResponse"
+                            "$ref": "#/definitions/dto.RenewAccessTokenResponse"
                         }
                     }
                 }
@@ -533,6 +533,17 @@ const docTemplate = `{
                 "quantity": {
                     "type": "integer",
                     "minimum": 1
+                }
+            }
+        },
+        "api.renewAccessTokenRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
                 }
             }
         },
@@ -777,6 +788,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RenewAccessTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "access_token_expires_at": {
                     "type": "string"
                 }
             }

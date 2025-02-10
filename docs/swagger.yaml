@@ -14,6 +14,13 @@ definitions:
     - price
     - quantity
     type: object
+  api.renewAccessTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
   api.updateProductRequestBody:
     properties:
       name:
@@ -177,6 +184,13 @@ definitions:
       quantity:
         type: integer
       updated_at:
+        type: string
+    type: object
+  dto.RenewAccessTokenResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
         type: string
     type: object
   dto.UpdateOrderRequestBody:
@@ -499,22 +513,22 @@ paths:
     post:
       consumes:
       - application/json
-      description: Register a new customer with username, password, and role
+      description: Refresh the access token using a valid refresh token
       parameters:
-      - description: Customer details
+      - description: Refresh token request
         in: body
-        name: customer
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateCustomerRequest'
+          $ref: '#/definitions/api.renewAccessTokenRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.CustomerResponse'
-      summary: Create a new customer
+            $ref: '#/definitions/dto.RenewAccessTokenResponse'
+      summary: Renew access token
       tags:
-      - customers
+      - auth
 swagger: "2.0"
