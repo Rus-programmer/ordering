@@ -9,6 +9,15 @@ import (
 	"ordering/util"
 )
 
+// createCustomer handles customer creation.
+// @Summary Create a new customer
+// @Description Register a new customer with username, password, and role
+// @Tags customers
+// @Accept json
+// @Produce json
+// @Param customer body dto.CreateCustomerRequest true "Customer details"
+// @Success 200 {object} dto.CustomerResponse
+// @Router /customers [post]
 func (server *Server) createCustomer(ctx *gin.Context) {
 	var req dto.CreateCustomerRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -31,6 +40,15 @@ func (server *Server) createCustomer(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, customer)
 }
 
+// login handles user authentication.
+// @Summary User login
+// @Description Authenticate user with username and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param credentials body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} dto.LoginResponse
+// @Router /login [post]
 func (server *Server) login(ctx *gin.Context) {
 	var req dto.LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

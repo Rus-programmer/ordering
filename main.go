@@ -7,13 +7,17 @@ import (
 	"github.com/rs/zerolog/log"
 	"ordering/api"
 	db "ordering/db/sqlc"
+	_ "ordering/docs"
 	"ordering/middleware"
 	"ordering/services"
 	"ordering/token"
-	util "ordering/util"
+	"ordering/util"
 	"os"
 )
 
+// @title Ordering project
+// @description This project is a backend service designed for managing orders
+// @version 1.0
 func main() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
