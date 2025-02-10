@@ -223,6 +223,21 @@ func (mr *MockServiceMockRecorder) RenewAccessToken(ctx, refreshToken any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenewAccessToken", reflect.TypeOf((*MockService)(nil).RenewAccessToken), ctx, refreshToken)
 }
 
+// UpdateOrder mocks base method.
+func (m *MockService) UpdateOrder(ctx context.Context, req order.UpdateOrderParams) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrder indicates an expected call of UpdateOrder.
+func (mr *MockServiceMockRecorder) UpdateOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrder", reflect.TypeOf((*MockService)(nil).UpdateOrder), ctx, req)
+}
+
 // UpdateProduct mocks base method.
 func (m *MockService) UpdateProduct(ctx context.Context, id int64, body products.UpdateProduct) (dto.ProductResponse, error) {
 	m.ctrl.T.Helper()

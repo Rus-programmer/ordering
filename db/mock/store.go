@@ -159,6 +159,20 @@ func (mr *MockStoreMockRecorder) DeleteOrder(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrder", reflect.TypeOf((*MockStore)(nil).DeleteOrder), ctx, id)
 }
 
+// DeleteOrderProduct mocks base method.
+func (m *MockStore) DeleteOrderProduct(ctx context.Context, arg db.DeleteOrderProductParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteOrderProduct", ctx, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteOrderProduct indicates an expected call of DeleteOrderProduct.
+func (mr *MockStoreMockRecorder) DeleteOrderProduct(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrderProduct", reflect.TypeOf((*MockStore)(nil).DeleteOrderProduct), ctx, arg)
+}
+
 // DeleteProduct mocks base method.
 func (m *MockStore) DeleteProduct(ctx context.Context, id int64) error {
 	m.ctrl.T.Helper()
@@ -245,6 +259,21 @@ func (m *MockStore) GetProduct(ctx context.Context, id int64) (db.Product, error
 func (mr *MockStoreMockRecorder) GetProduct(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProduct", reflect.TypeOf((*MockStore)(nil).GetProduct), ctx, id)
+}
+
+// GetProductForUpdate mocks base method.
+func (m *MockStore) GetProductForUpdate(ctx context.Context, id int64) (db.Product, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductForUpdate", ctx, id)
+	ret0, _ := ret[0].(db.Product)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductForUpdate indicates an expected call of GetProductForUpdate.
+func (mr *MockStoreMockRecorder) GetProductForUpdate(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductForUpdate", reflect.TypeOf((*MockStore)(nil).GetProductForUpdate), ctx, id)
 }
 
 // GetSession mocks base method.
@@ -337,19 +366,34 @@ func (mr *MockStoreMockRecorder) SoftDeleteOrder(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SoftDeleteOrder", reflect.TypeOf((*MockStore)(nil).SoftDeleteOrder), ctx, arg)
 }
 
-// UpdateOrderStatus mocks base method.
-func (m *MockStore) UpdateOrderStatus(ctx context.Context, arg db.UpdateOrderStatusParams) (db.Order, error) {
+// UpdateOrder mocks base method.
+func (m *MockStore) UpdateOrder(ctx context.Context, arg db.UpdateOrderParams) (db.Order, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateOrderStatus", ctx, arg)
+	ret := m.ctrl.Call(m, "UpdateOrder", ctx, arg)
 	ret0, _ := ret[0].(db.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateOrderStatus indicates an expected call of UpdateOrderStatus.
-func (mr *MockStoreMockRecorder) UpdateOrderStatus(ctx, arg any) *gomock.Call {
+// UpdateOrder indicates an expected call of UpdateOrder.
+func (mr *MockStoreMockRecorder) UpdateOrder(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrderStatus", reflect.TypeOf((*MockStore)(nil).UpdateOrderStatus), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrder", reflect.TypeOf((*MockStore)(nil).UpdateOrder), ctx, arg)
+}
+
+// UpdateOrderProduct mocks base method.
+func (m *MockStore) UpdateOrderProduct(ctx context.Context, arg db.UpdateOrderProductParams) (db.OrderProduct, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateOrderProduct", ctx, arg)
+	ret0, _ := ret[0].(db.OrderProduct)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrderProduct indicates an expected call of UpdateOrderProduct.
+func (mr *MockStoreMockRecorder) UpdateOrderProduct(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrderProduct", reflect.TypeOf((*MockStore)(nil).UpdateOrderProduct), ctx, arg)
 }
 
 // UpdateProduct mocks base method.
