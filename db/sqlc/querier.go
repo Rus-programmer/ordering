@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -22,12 +23,17 @@ type Querier interface {
 	DeleteOrderProduct(ctx context.Context, arg DeleteOrderProductParams) error
 	DeleteProduct(ctx context.Context, id int64) error
 	GetCustomerByUsername(ctx context.Context, username string) (Customer, error)
+	GetErrorRate(ctx context.Context) (pgtype.Numeric, error)
 	GetOrder(ctx context.Context, arg GetOrderParams) (Order, error)
 	GetOrderProducts(ctx context.Context, orderID int64) ([]OrderProduct, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)
 	GetProductForUpdate(ctx context.Context, id int64) (Product, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetTotalPrice(ctx context.Context, orderID int64) (int64, error)
+	GetTotalRequests(ctx context.Context) (int64, error)
+	GetTotalRequestsByMethod(ctx context.Context) ([]GetTotalRequestsByMethodRow, error)
+	GetTotalRequestsByPath(ctx context.Context) ([]GetTotalRequestsByPathRow, error)
+	GetTotalRequestsByStatusCode(ctx context.Context) ([]GetTotalRequestsByStatusCodeRow, error)
 	ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error)
 	ListOrders(ctx context.Context, arg ListOrdersParams) ([]int64, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)

@@ -15,7 +15,7 @@ func (middleware *middlewareImpl) LogDB() gin.HandlerFunc {
 
 		arg := db.CreateLogParams{
 			Method:      ginInfo.Method,
-			Path:        ginInfo.Path,
+			Path:        ctx.Request.URL.Path,
 			StatusCode:  int32(ginInfo.StatusCode),
 			ElapsedTime: ginInfo.Duration.String(),
 			Time:        ginInfo.BeginTime,

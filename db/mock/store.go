@@ -15,6 +15,7 @@ import (
 	reflect "reflect"
 
 	uuid "github.com/google/uuid"
+	pgtype "github.com/jackc/pgx/v5/pgtype"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -216,6 +217,21 @@ func (mr *MockStoreMockRecorder) GetCustomerByUsername(ctx, username any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCustomerByUsername", reflect.TypeOf((*MockStore)(nil).GetCustomerByUsername), ctx, username)
 }
 
+// GetErrorRate mocks base method.
+func (m *MockStore) GetErrorRate(ctx context.Context) (pgtype.Numeric, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetErrorRate", ctx)
+	ret0, _ := ret[0].(pgtype.Numeric)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetErrorRate indicates an expected call of GetErrorRate.
+func (mr *MockStoreMockRecorder) GetErrorRate(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetErrorRate", reflect.TypeOf((*MockStore)(nil).GetErrorRate), ctx)
+}
+
 // GetOrder mocks base method.
 func (m *MockStore) GetOrder(ctx context.Context, arg db.GetOrderParams) (db.Order, error) {
 	m.ctrl.T.Helper()
@@ -304,6 +320,66 @@ func (m *MockStore) GetTotalPrice(ctx context.Context, orderID int64) (int64, er
 func (mr *MockStoreMockRecorder) GetTotalPrice(ctx, orderID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalPrice", reflect.TypeOf((*MockStore)(nil).GetTotalPrice), ctx, orderID)
+}
+
+// GetTotalRequests mocks base method.
+func (m *MockStore) GetTotalRequests(ctx context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalRequests", ctx)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalRequests indicates an expected call of GetTotalRequests.
+func (mr *MockStoreMockRecorder) GetTotalRequests(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalRequests", reflect.TypeOf((*MockStore)(nil).GetTotalRequests), ctx)
+}
+
+// GetTotalRequestsByMethod mocks base method.
+func (m *MockStore) GetTotalRequestsByMethod(ctx context.Context) ([]db.GetTotalRequestsByMethodRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalRequestsByMethod", ctx)
+	ret0, _ := ret[0].([]db.GetTotalRequestsByMethodRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalRequestsByMethod indicates an expected call of GetTotalRequestsByMethod.
+func (mr *MockStoreMockRecorder) GetTotalRequestsByMethod(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalRequestsByMethod", reflect.TypeOf((*MockStore)(nil).GetTotalRequestsByMethod), ctx)
+}
+
+// GetTotalRequestsByPath mocks base method.
+func (m *MockStore) GetTotalRequestsByPath(ctx context.Context) ([]db.GetTotalRequestsByPathRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalRequestsByPath", ctx)
+	ret0, _ := ret[0].([]db.GetTotalRequestsByPathRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalRequestsByPath indicates an expected call of GetTotalRequestsByPath.
+func (mr *MockStoreMockRecorder) GetTotalRequestsByPath(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalRequestsByPath", reflect.TypeOf((*MockStore)(nil).GetTotalRequestsByPath), ctx)
+}
+
+// GetTotalRequestsByStatusCode mocks base method.
+func (m *MockStore) GetTotalRequestsByStatusCode(ctx context.Context) ([]db.GetTotalRequestsByStatusCodeRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTotalRequestsByStatusCode", ctx)
+	ret0, _ := ret[0].([]db.GetTotalRequestsByStatusCodeRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTotalRequestsByStatusCode indicates an expected call of GetTotalRequestsByStatusCode.
+func (mr *MockStoreMockRecorder) GetTotalRequestsByStatusCode(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTotalRequestsByStatusCode", reflect.TypeOf((*MockStore)(nil).GetTotalRequestsByStatusCode), ctx)
 }
 
 // ListCustomers mocks base method.
