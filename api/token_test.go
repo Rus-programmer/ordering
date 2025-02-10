@@ -84,7 +84,7 @@ func TestRenewAccessTokenAPI(t *testing.T) {
 			tc.buildStubs(service)
 
 			data, err := json.Marshal(tc.body)
-			request, err := http.NewRequest(http.MethodPost, "/tokens/renew_access", bytes.NewReader(data))
+			request, err := http.NewRequest(http.MethodPost, "/renew_access", bytes.NewReader(data))
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)
