@@ -14,6 +14,7 @@ import (
 	dto "ordering/dto"
 	auth "ordering/services/auth"
 	customers "ordering/services/customers"
+	order "ordering/services/orders"
 	products "ordering/services/products"
 	token "ordering/token"
 	reflect "reflect"
@@ -60,6 +61,21 @@ func (mr *MockServiceMockRecorder) CreateCustomer(ctx, req any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCustomer", reflect.TypeOf((*MockService)(nil).CreateCustomer), ctx, req)
 }
 
+// CreateOrder mocks base method.
+func (m *MockService) CreateOrder(ctx context.Context, req order.CreateOrderParams) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrder indicates an expected call of CreateOrder.
+func (mr *MockServiceMockRecorder) CreateOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockService)(nil).CreateOrder), ctx, req)
+}
+
 // CreateProduct mocks base method.
 func (m *MockService) CreateProduct(ctx context.Context, body products.CreateProduct) (dto.ProductResponse, error) {
 	m.ctrl.T.Helper()
@@ -75,6 +91,20 @@ func (mr *MockServiceMockRecorder) CreateProduct(ctx, body any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProduct", reflect.TypeOf((*MockService)(nil).CreateProduct), ctx, body)
 }
 
+// DeleteOrder mocks base method.
+func (m *MockService) DeleteOrder(ctx context.Context, req order.DeleteOrderParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteOrder", ctx, req)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteOrder indicates an expected call of DeleteOrder.
+func (mr *MockServiceMockRecorder) DeleteOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrder", reflect.TypeOf((*MockService)(nil).DeleteOrder), ctx, req)
+}
+
 // DeleteProduct mocks base method.
 func (m *MockService) DeleteProduct(ctx context.Context, id int64) error {
 	m.ctrl.T.Helper()
@@ -87,6 +117,21 @@ func (m *MockService) DeleteProduct(ctx context.Context, id int64) error {
 func (mr *MockServiceMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockService)(nil).DeleteProduct), ctx, id)
+}
+
+// GetOrder mocks base method.
+func (m *MockService) GetOrder(ctx context.Context, req order.GetOrder) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrder indicates an expected call of GetOrder.
+func (mr *MockServiceMockRecorder) GetOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrder", reflect.TypeOf((*MockService)(nil).GetOrder), ctx, req)
 }
 
 // GetProduct mocks base method.
@@ -116,6 +161,21 @@ func (m *MockService) GetTokenMaker() token.Maker {
 func (mr *MockServiceMockRecorder) GetTokenMaker() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTokenMaker", reflect.TypeOf((*MockService)(nil).GetTokenMaker))
+}
+
+// ListOrders mocks base method.
+func (m *MockService) ListOrders(ctx context.Context, req order.ListOrders) ([]dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListOrders", ctx, req)
+	ret0, _ := ret[0].([]dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListOrders indicates an expected call of ListOrders.
+func (mr *MockServiceMockRecorder) ListOrders(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrders", reflect.TypeOf((*MockService)(nil).ListOrders), ctx, req)
 }
 
 // ListProducts mocks base method.
@@ -161,6 +221,21 @@ func (m *MockService) RenewAccessToken(ctx context.Context, refreshToken string)
 func (mr *MockServiceMockRecorder) RenewAccessToken(ctx, refreshToken any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenewAccessToken", reflect.TypeOf((*MockService)(nil).RenewAccessToken), ctx, refreshToken)
+}
+
+// UpdateOrder mocks base method.
+func (m *MockService) UpdateOrder(ctx context.Context, req order.UpdateOrderParams) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateOrder indicates an expected call of UpdateOrder.
+func (mr *MockServiceMockRecorder) UpdateOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrder", reflect.TypeOf((*MockService)(nil).UpdateOrder), ctx, req)
 }
 
 // UpdateProduct mocks base method.

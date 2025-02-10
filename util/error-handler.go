@@ -22,6 +22,7 @@ var (
 	ErrExpiredToken           = errors.New("token has expired")
 	ErrInvalidPassword        = errors.New("invalid password")
 	ErrIncorrectSessionUser   = errors.New("incorrect session user")
+	ErrMismatchedData         = errors.New("mismatched data")
 	ErrMismatchedSessionToken = errors.New("mismatched session token")
 	ErrSessionExpired         = errors.New("expired session")
 	ErrBlockedSession         = errors.New("blocked session")
@@ -55,6 +56,8 @@ func ErrorHandler(err error) (int, gin.H) {
 		return http.StatusUnauthorized, ErrorResponse(err)
 	case errors.Is(err, ErrExpiredToken):
 		return http.StatusUnauthorized, ErrorResponse(err)
+	case errors.Is(err, ErrMismatchedData):
+		return http.StatusConflict, ErrorResponse(err)
 	case errors.Is(err, ErrRecordNotFound):
 		return http.StatusNotFound, ErrorResponse(err)
 	}

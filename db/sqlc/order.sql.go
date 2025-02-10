@@ -7,22 +7,28 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (
-  customer_id
-) VALUES (
-  $1
-) RETURNING id, customer_id, status, is_deleted, created_at, updated_at
+INSERT INTO orders (customer_id, total_price)
+VALUES ($1, $2)
+RETURNING id, customer_id, total_price, status, is_deleted, created_at, updated_at
 `
 
-func (q *Queries) CreateOrder(ctx context.Context, customerID int64) (Order, error) {
-	row := q.db.QueryRow(ctx, createOrder, customerID)
+type CreateOrderParams struct {
+	CustomerID int64 `json:"customer_id"`
+	TotalPrice int64 `json:"total_price"`
+}
+
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
+	row := q.db.QueryRow(ctx, createOrder, arg.CustomerID, arg.TotalPrice)
 	var i Order
 	err := row.Scan(
 		&i.ID,
 		&i.CustomerID,
+		&i.TotalPrice,
 		&i.Status,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -31,14 +37,10 @@ func (q *Queries) CreateOrder(ctx context.Context, customerID int64) (Order, err
 	return i, err
 }
 
-type CreateOrderProductsParams struct {
-	OrderID   int64 `json:"order_id"`
-	ProductID int64 `json:"product_id"`
-	Quantity  int64 `json:"quantity"`
-}
-
 const deleteOrder = `-- name: DeleteOrder :exec
-DELETE FROM orders WHERE id = $1
+DELETE
+FROM orders
+WHERE id = $1
 `
 
 func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
@@ -47,8 +49,11 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, customer_id, status, is_deleted, created_at, updated_at FROM orders o
-WHERE o.id = $1 and (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+SELECT id, customer_id, total_price, status, is_deleted, created_at, updated_at
+FROM orders o
+WHERE o.id = $1
+  and (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+  AND is_deleted = false
 `
 
 type GetOrderParams struct {
@@ -62,6 +67,7 @@ func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (Order, erro
 	err := row.Scan(
 		&i.ID,
 		&i.CustomerID,
+		&i.TotalPrice,
 		&i.Status,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -70,45 +76,41 @@ func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (Order, erro
 	return i, err
 }
 
-const getTotalPrice = `-- name: GetTotalPrice :one
-SELECT SUM(p.price * op.quantity)
-FROM order_products op
-JOIN products p ON op.product_id = p.id
-WHERE op.order_id = $1
+const listOrders = `-- name: ListOrders :many
+SELECT id
+FROM orders
+WHERE (customer_id = $1 OR EXISTS (SELECT 1 FROM customers WHERE id = $1 AND role = 'admin'))
+  AND ($2::order_status IS NULL OR status = $2)
+  AND ($3::bigint IS NULL OR total_price >= $3)
+  AND ($4::bigint IS NULL OR total_price <= $4)
+  AND is_deleted = false
 `
 
-func (q *Queries) GetTotalPrice(ctx context.Context, orderID int64) (int64, error) {
-	row := q.db.QueryRow(ctx, getTotalPrice, orderID)
-	var sum int64
-	err := row.Scan(&sum)
-	return sum, err
+type ListOrdersParams struct {
+	CustomerID int64           `json:"customer_id"`
+	Status     NullOrderStatus `json:"status"`
+	MinPrice   pgtype.Int8     `json:"min_price"`
+	MaxPrice   pgtype.Int8     `json:"max_price"`
 }
 
-const listOrders = `-- name: ListOrders :many
-SELECT id, customer_id, status, is_deleted, created_at, updated_at FROM orders
-WHERE customer_id = $1 OR EXISTS (SELECT 1 FROM customers WHERE id = $1 AND role = 'admin')
-`
-
-func (q *Queries) ListOrders(ctx context.Context, customerID int64) ([]Order, error) {
-	rows, err := q.db.Query(ctx, listOrders, customerID)
+func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]int64, error) {
+	rows, err := q.db.Query(ctx, listOrders,
+		arg.CustomerID,
+		arg.Status,
+		arg.MinPrice,
+		arg.MaxPrice,
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Order{}
+	items := []int64{}
 	for rows.Next() {
-		var i Order
-		if err := rows.Scan(
-			&i.ID,
-			&i.CustomerID,
-			&i.Status,
-			&i.IsDeleted,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -119,8 +121,9 @@ func (q *Queries) ListOrders(ctx context.Context, customerID int64) ([]Order, er
 const softDeleteOrder = `-- name: SoftDeleteOrder :one
 UPDATE orders o
 SET is_deleted = TRUE
-WHERE o.id = $1 AND (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
-RETURNING id, customer_id, status, is_deleted, created_at, updated_at
+WHERE o.id = $1
+  AND (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+RETURNING id, customer_id, total_price, status, is_deleted, created_at, updated_at
 `
 
 type SoftDeleteOrderParams struct {
@@ -134,6 +137,7 @@ func (q *Queries) SoftDeleteOrder(ctx context.Context, arg SoftDeleteOrderParams
 	err := row.Scan(
 		&i.ID,
 		&i.CustomerID,
+		&i.TotalPrice,
 		&i.Status,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -142,25 +146,35 @@ func (q *Queries) SoftDeleteOrder(ctx context.Context, arg SoftDeleteOrderParams
 	return i, err
 }
 
-const updateOrderStatus = `-- name: UpdateOrderStatus :one
+const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders o
-SET status = $3, updated_at = NOW()
-WHERE o.id = $1 AND (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
-RETURNING id, customer_id, status, is_deleted, created_at, updated_at
+SET
+    status = COALESCE($3, status),
+    total_price = COALESCE($4, total_price)
+WHERE o.id = $1
+  AND (customer_id = $2 OR EXISTS (SELECT 1 FROM customers WHERE id = $2 AND role = 'admin'))
+RETURNING id, customer_id, total_price, status, is_deleted, created_at, updated_at
 `
 
-type UpdateOrderStatusParams struct {
-	ID         int64       `json:"id"`
-	CustomerID int64       `json:"customer_id"`
-	Status     OrderStatus `json:"status"`
+type UpdateOrderParams struct {
+	ID         int64           `json:"id"`
+	CustomerID int64           `json:"customer_id"`
+	Status     NullOrderStatus `json:"status"`
+	TotalPrice pgtype.Int8     `json:"total_price"`
 }
 
-func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) (Order, error) {
-	row := q.db.QueryRow(ctx, updateOrderStatus, arg.ID, arg.CustomerID, arg.Status)
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
+	row := q.db.QueryRow(ctx, updateOrder,
+		arg.ID,
+		arg.CustomerID,
+		arg.Status,
+		arg.TotalPrice,
+	)
 	var i Order
 	err := row.Scan(
 		&i.ID,
 		&i.CustomerID,
+		&i.TotalPrice,
 		&i.Status,
 		&i.IsDeleted,
 		&i.CreatedAt,
