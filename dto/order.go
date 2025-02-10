@@ -32,3 +32,16 @@ type OrderResponse struct {
 	UpdatedAt  time.Time              `json:"updated_at"`
 	Products   []OrderProductResponse `json:"products"`
 }
+
+type CreateOrderRequestBody struct {
+	Products []CreateOrderItem `json:"products" binding:"required,notEmptyArray"`
+}
+
+type CreateOrderItem struct {
+	ProductID     int64 `json:"product_id" binding:"required,min=1"`
+	OrderedAmount int64 `json:"ordered_amount" binding:"required,min=1"`
+}
+
+type UpdateOrderRequestBody struct {
+	Products []CreateOrderItem `json:"products" binding:"required,notEmptyArray"`
+}

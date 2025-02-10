@@ -39,6 +39,7 @@ func NewServer(config util.Config, middleware middleware.Middleware, service ser
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		err := v.RegisterValidation("role", validators.ValidRole)
 		err = v.RegisterValidation("orderStatus", validators.ValidOrderStatus)
+		err = v.RegisterValidation("notEmptyArray", validators.NotEmptyArrayValidator)
 		if err != nil {
 			return nil, err
 		}
@@ -68,4 +69,5 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/orders/:id", server.getOrder)
 	authRoutes.GET("/orders", server.listOrders)
 	authRoutes.DELETE("/orders/:id", server.deleteOrder)
+	authRoutes.POST("/orders", server.createOrder)
 }

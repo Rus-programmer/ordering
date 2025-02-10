@@ -82,3 +82,32 @@ func (server *Server) deleteOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, nil)
 }
+
+func (server *Server) createOrder(ctx *gin.Context) {
+	var bodyReq dto.CreateOrderRequestBody
+	if err := ctx.ShouldBindJSON(&bodyReq); err != nil {
+		ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+		return
+	}
+
+	payload := ctx.MustGet(middleware.AuthorizationPayloadKey).(*token.Payload)
+
+	products := make([]order.CreateOrderItem, len(bodyReq.Products))
+	for i, item := range bodyReq.Products {
+		products[i] = order.CreateOrderItem{
+			ProductID:     item.ProductID,
+			OrderedAmount: item.OrderedAmount,
+		}
+	}
+
+	newOrder, err := server.service.CreateOrder(ctx, order.CreateOrderParams{
+		Payload:  payload,
+		Products: products,
+	})
+	if err != nil {
+		ctx.JSON(util.ErrorHandler(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, newOrder)
+}

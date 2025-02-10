@@ -61,6 +61,21 @@ func (mr *MockServiceMockRecorder) CreateCustomer(ctx, req any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCustomer", reflect.TypeOf((*MockService)(nil).CreateCustomer), ctx, req)
 }
 
+// CreateOrder mocks base method.
+func (m *MockService) CreateOrder(ctx context.Context, req order.CreateOrderParams) (dto.OrderResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrder", ctx, req)
+	ret0, _ := ret[0].(dto.OrderResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrder indicates an expected call of CreateOrder.
+func (mr *MockServiceMockRecorder) CreateOrder(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrder", reflect.TypeOf((*MockService)(nil).CreateOrder), ctx, req)
+}
+
 // CreateProduct mocks base method.
 func (m *MockService) CreateProduct(ctx context.Context, body products.CreateProduct) (dto.ProductResponse, error) {
 	m.ctrl.T.Helper()
