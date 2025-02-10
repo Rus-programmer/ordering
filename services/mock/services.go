@@ -119,6 +119,21 @@ func (mr *MockServiceMockRecorder) DeleteProduct(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteProduct", reflect.TypeOf((*MockService)(nil).DeleteProduct), ctx, id)
 }
 
+// GetMetrics mocks base method.
+func (m *MockService) GetMetrics(ctx context.Context) (dto.MetricsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMetrics", ctx)
+	ret0, _ := ret[0].(dto.MetricsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMetrics indicates an expected call of GetMetrics.
+func (mr *MockServiceMockRecorder) GetMetrics(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetrics", reflect.TypeOf((*MockService)(nil).GetMetrics), ctx)
+}
+
 // GetOrder mocks base method.
 func (m *MockService) GetOrder(ctx context.Context, req order.GetOrder) (dto.OrderResponse, error) {
 	m.ctrl.T.Helper()

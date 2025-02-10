@@ -4,6 +4,7 @@ import (
 	db "ordering/db/sqlc"
 	"ordering/services/auth"
 	"ordering/services/customers"
+	"ordering/services/metrics"
 	order "ordering/services/orders"
 	"ordering/services/products"
 	"ordering/token"
@@ -15,6 +16,7 @@ type Service interface {
 	customers.Customer
 	products.Product
 	order.Order
+	metrics.Metric
 	GetTokenMaker() token.Maker
 }
 
@@ -23,6 +25,7 @@ type service struct {
 	products.Product
 	auth.Auth
 	order.Order
+	metrics.Metric
 	tokenMaker token.Maker
 }
 
@@ -32,6 +35,7 @@ func NewService(config util.Config, store db.Store, tokenMaker token.Maker) Serv
 		Product:    products.NewProduct(config, store, tokenMaker),
 		Auth:       auth.NewAuth(config, store, tokenMaker),
 		Order:      order.NewOrder(config, store, tokenMaker),
+		Metric:     metrics.NewMetric(store),
 		tokenMaker: tokenMaker,
 	}
 }

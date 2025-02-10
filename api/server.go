@@ -71,4 +71,6 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/orders/:id", server.deleteOrder)
 	authRoutes.POST("/orders", server.createOrder)
 	authRoutes.PUT("/orders/:id", server.updateOrder)
+
+	authRoutes.GET("/metrics", server.getMetrics)
 }
