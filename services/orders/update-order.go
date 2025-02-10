@@ -121,10 +121,28 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 
 		totalPrice := int64(0)
 		for _, orderProduct := range updatedOrderProducts {
-			product, err := q.GetProductForUpdate(ctx, orderProduct.ProductID)
+			var product db.Product
+			product, err = q.GetProductForUpdate(ctx, orderProduct.ProductID)
 			if err != nil {
 				return err
 			}
+			//updating product quantity only for confirmed orders
+			if req.Status == db.OrderStatusConfirmed {
+				if product.Quantity-orderProduct.OrderedAmount < 0 {
+					return fmt.Errorf("not enough stock available")
+				}
+				product, err = q.UpdateProduct(ctx, db.UpdateProductParams{
+					Quantity: pgtype.Int8{
+						Int64: product.Quantity - orderProduct.OrderedAmount,
+						Valid: true,
+					},
+					ID: orderProduct.ProductID,
+				})
+				if err != nil {
+					return err
+				}
+			}
+
 			totalPrice += product.Price * orderProduct.OrderedAmount
 			orderProductResponses = append(orderProductResponses, dto.OrderProductResponse{
 				Product: dto.ProductResponse{
