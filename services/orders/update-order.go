@@ -187,7 +187,7 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		return dto.OrderResponse{}, err
 	}
 
-	return dto.OrderResponse{
+	orderResponse := dto.OrderResponse{
 		ID:         newOrder.ID,
 		CustomerID: newOrder.CustomerID,
 		IsDeleted:  newOrder.IsDeleted,
@@ -196,7 +196,11 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		CreatedAt:  newOrder.CreatedAt,
 		UpdatedAt:  newOrder.UpdatedAt,
 		Products:   orderProductResponses,
-	}, nil
+	}
+
+	o.cache.Remove(orderResponse.ID)
+	o.cache.Add(orderResponse.ID, orderResponse)
+	return orderResponse, nil
 }
 
 func (o *UpdateOrderParams) SortProductsByID() {

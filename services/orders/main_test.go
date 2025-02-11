@@ -1,10 +1,9 @@
 package order
 
 import (
-	"github.com/stretchr/testify/require"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"go.uber.org/mock/gomock"
 	mockdb "ordering/db/mock"
-	"ordering/token"
 	"ordering/util"
 	"testing"
 	"time"
@@ -15,16 +14,19 @@ func newTestOrder(t *testing.T) (Order, *mockdb.MockStore) {
 	defer ctrl.Finish()
 
 	store := mockdb.NewMockStore(ctrl)
-	mockTokenMaker, err := token.NewPasetoMaker("12345678912345678912345678900032")
-	require.NoError(t, err)
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
+	cache, _ := lru.New[int64, any](50)
+
+	t.Cleanup(func() {
+		cache.Purge()
+	})
 
 	return &order{
-		tokenMaker: mockTokenMaker,
-		store:      store,
-		config:     config,
+		store:  store,
+		config: config,
+		cache:  cache,
 	}, store
 }
