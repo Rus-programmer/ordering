@@ -34,6 +34,7 @@ func (o *order) DeleteOrder(ctx context.Context, req DeleteOrderParams) error {
 	if err != nil {
 		return err
 	}
+	o.cache.Remove(req.ID)
 
 	return nil
 }

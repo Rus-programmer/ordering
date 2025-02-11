@@ -1,7 +1,6 @@
 package order
 
 import (
-	"cmp"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -9,7 +8,6 @@ import (
 	db "ordering/db/sqlc"
 	"ordering/dto"
 	"ordering/token"
-	"slices"
 	"sort"
 )
 
@@ -89,8 +87,6 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		for productID := range existingMap {
 			toDelete = append(toDelete, productID)
 		}
-		// sorting for prevent deadlocks
-		slices.SortFunc(toDelete, cmp.Compare[int64])
 
 		if len(toDelete) > 0 {
 			for _, productID := range toDelete {
@@ -121,11 +117,6 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		if err != nil {
 			return err
 		}
-
-		// sorting for prevent deadlocks
-		slices.SortFunc(existingOrderProducts, func(a, b db.OrderProduct) int {
-			return cmp.Compare(a.ProductID, b.ProductID)
-		})
 
 		totalPrice := int64(0)
 		for _, orderProduct := range updatedOrderProducts {
@@ -196,7 +187,7 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		return dto.OrderResponse{}, err
 	}
 
-	return dto.OrderResponse{
+	orderResponse := dto.OrderResponse{
 		ID:         newOrder.ID,
 		CustomerID: newOrder.CustomerID,
 		IsDeleted:  newOrder.IsDeleted,
@@ -205,7 +196,11 @@ func (o *order) UpdateOrder(ctx context.Context, req UpdateOrderParams) (dto.Ord
 		CreatedAt:  newOrder.CreatedAt,
 		UpdatedAt:  newOrder.UpdatedAt,
 		Products:   orderProductResponses,
-	}, nil
+	}
+
+	o.cache.Remove(orderResponse.ID)
+	o.cache.Add(orderResponse.ID, orderResponse)
+	return orderResponse, nil
 }
 
 func (o *UpdateOrderParams) SortProductsByID() {

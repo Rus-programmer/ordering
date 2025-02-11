@@ -2,9 +2,9 @@ package order
 
 import (
 	"context"
+	lru "github.com/hashicorp/golang-lru/v2"
 	db "ordering/db/sqlc"
 	"ordering/dto"
-	"ordering/token"
 	"ordering/util"
 )
 
@@ -17,15 +17,15 @@ type Order interface {
 }
 
 type order struct {
-	store      db.Store
-	tokenMaker token.Maker
-	config     util.Config
+	store  db.Store
+	config util.Config
+	cache  *lru.Cache[int64, any]
 }
 
-func NewOrder(config util.Config, store db.Store, tokenMaker token.Maker) Order {
+func NewOrder(config util.Config, store db.Store, cache *lru.Cache[int64, any]) Order {
 	return &order{
-		tokenMaker: tokenMaker,
-		store:      store,
-		config:     config,
+		store:  store,
+		config: config,
+		cache:  cache,
 	}
 }

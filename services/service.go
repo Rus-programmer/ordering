@@ -1,6 +1,7 @@
 package services
 
 import (
+	lru "github.com/hashicorp/golang-lru/v2"
 	db "ordering/db/sqlc"
 	"ordering/services/auth"
 	"ordering/services/customers"
@@ -30,11 +31,12 @@ type service struct {
 }
 
 func NewService(config util.Config, store db.Store, tokenMaker token.Maker) Service {
+	cache, _ := lru.New[int64, any](10000)
 	return &service{
 		Customer:   customers.NewCustomer(config, store, tokenMaker),
 		Product:    products.NewProduct(config, store, tokenMaker),
 		Auth:       auth.NewAuth(config, store, tokenMaker),
-		Order:      order.NewOrder(config, store, tokenMaker),
+		Order:      order.NewOrder(config, store, cache),
 		Metric:     metrics.NewMetric(store),
 		tokenMaker: tokenMaker,
 	}

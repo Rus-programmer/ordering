@@ -14,6 +14,14 @@ type GetOrder struct {
 }
 
 func (o *order) GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, error) {
+	if cachedOrder, ok := o.cache.Get(req.ID); ok {
+		if orderResponse, valid := cachedOrder.(dto.OrderResponse); valid {
+			if err := validateOrderAccess(orderResponse.CustomerID, req.Payload); err != nil {
+				return dto.OrderResponse{}, util.ErrRecordNotFound
+			}
+			return orderResponse, nil
+		}
+	}
 	arg := db.GetOrderParams{
 		CustomerID: req.Payload.CustomerID,
 		ID:         req.ID,
@@ -23,7 +31,7 @@ func (o *order) GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, 
 		return dto.OrderResponse{}, err
 	}
 
-	if order.CustomerID != req.Payload.CustomerID && req.Payload.Role != string(db.UserRoleAdmin) {
+	if err := validateOrderAccess(order.CustomerID, req.Payload); err != nil {
 		return dto.OrderResponse{}, util.ErrRecordNotFound
 	}
 
@@ -62,7 +70,7 @@ func (o *order) GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, 
 		return dto.OrderResponse{}, util.ErrMismatchedData
 	}
 
-	return dto.OrderResponse{
+	orderResponse := dto.OrderResponse{
 		ID:         order.ID,
 		CustomerID: order.CustomerID,
 		IsDeleted:  order.IsDeleted,
@@ -71,5 +79,15 @@ func (o *order) GetOrder(ctx context.Context, req GetOrder) (dto.OrderResponse, 
 		CreatedAt:  order.CreatedAt,
 		UpdatedAt:  order.UpdatedAt,
 		Products:   orderProductResponses,
-	}, nil
+	}
+
+	o.cache.Add(req.ID, orderResponse)
+	return orderResponse, nil
+}
+
+func validateOrderAccess(customerID int64, payload *token.Payload) error {
+	if customerID != payload.CustomerID && payload.Role != string(db.UserRoleAdmin) {
+		return util.ErrRecordNotFound
+	}
+	return nil
 }
